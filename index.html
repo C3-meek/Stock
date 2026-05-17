@@ -1,0 +1,1328 @@
+<!doctype html>
+<!-- 構造：<!DOCTYPE html>〜</html> まで / Supabase + GitHub Pages 備蓄管理アプリ -->
+<html lang="ja">
+  <head>
+    <base target="_top" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>備蓄管理アプリ</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@300;400;500;700&family=Noto+Sans+JP:wght@300;400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+      :root {
+        --red: #ea4335;
+        --red-dark: #c5352a;
+        --red-light: #fef2f1;
+        --green: #34a853;
+        --green-dark: #2d9248;
+        --yellow: #fbbc04;
+        --bg: #fff8f6;
+        --bg2: #fff0ec;
+        --white: #ffffff;
+        --text: #2d2d2d;
+        --text2: #6b6b6b;
+        --border: #e8e0de;
+        --radius: 10px;
+        --shadow: 0 2px 8px rgba(234, 67, 53, 0.08);
+        --shadow-lg: 0 4px 20px rgba(234, 67, 53, 0.12);
+      }
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: "Noto Sans JP", sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        min-height: 100vh;
+        line-height: 1.6;
+      }
+      /* ── HEADER ── */
+      .app-header {
+        background: var(--white);
+        border-bottom: 1.5px solid var(--border);
+        padding: 0 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 60px;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        box-shadow: 0 1px 6px rgba(0, 0, 0, 0.06);
+      }
+      .app-logo {
+        font-family: "Zen Kaku Gothic New", sans-serif;
+        font-weight: 700;
+        font-size: 1.2rem;
+        color: var(--red);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .app-logo span {
+        font-size: 1.4rem;
+      }
+      nav {
+        display: flex;
+        gap: 4px;
+      }
+      .nav-btn {
+        padding: 8px 18px;
+        border: none;
+        border-radius: 20px;
+        background: transparent;
+        color: var(--text2);
+        font-family: inherit;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .nav-btn:hover {
+        background: var(--bg2);
+        color: var(--red);
+      }
+      .nav-btn.active {
+        background: var(--red);
+        color: white;
+      }
+      /* ── LAYOUT ── */
+      .app-body {
+        max-width: 1300px;
+        margin: 0 auto;
+        padding: 28px 20px;
+      }
+      .page {
+        display: none;
+      }
+      .page.active {
+        display: block;
+        animation: fadeUp 0.25s ease;
+      }
+      @keyframes fadeUp {
+        from {
+          opacity: 0;
+          transform: translateY(8px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .page-title {
+        font-family: "Zen Kaku Gothic New", sans-serif;
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: var(--red);
+        margin-bottom: 24px;
+        padding-bottom: 12px;
+        border-bottom: 2px solid var(--bg2);
+      }
+      /* ── CARD ── */
+      .card {
+        background: var(--white);
+        border-radius: var(--radius);
+        padding: 28px;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--border);
+      }
+      /* ── CONFIG BANNER ── */
+      #configBanner {
+        background: #fffbea;
+        border: 1.5px solid var(--yellow);
+        border-radius: var(--radius);
+        padding: 16px 20px;
+        margin-bottom: 24px;
+        font-size: 13px;
+        color: #7a5a00;
+        display: none;
+      }
+      #configBanner a {
+        color: var(--red);
+        font-weight: 600;
+      }
+      /* ── FORM ── */
+      .form-grid {
+        display: grid;
+        gap: 18px;
+        max-width: 640px;
+        margin: 0 auto;
+      }
+      .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px;
+      }
+      .form-group {
+        display: grid;
+        gap: 6px;
+      }
+      .form-group label {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--text2);
+      }
+      .form-group.req label::after {
+        content: " ＊";
+        color: var(--red);
+      }
+      input[type="text"],
+      input[type="number"],
+      input[type="date"],
+      select,
+      textarea {
+        width: 100%;
+        padding: 10px 14px;
+        border: 1.5px solid var(--border);
+        border-radius: var(--radius);
+        font-size: 14px;
+        font-family: inherit;
+        background: var(--white);
+        transition:
+          border-color 0.2s,
+          box-shadow 0.2s;
+        color: var(--text);
+      }
+      input:focus,
+      select:focus,
+      textarea:focus {
+        outline: none;
+        border-color: var(--red);
+        box-shadow: 0 0 0 3px rgba(234, 67, 53, 0.1);
+      }
+      textarea {
+        resize: vertical;
+        min-height: 76px;
+      }
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 10px 22px;
+        border: none;
+        border-radius: var(--radius);
+        font-family: inherit;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .btn-primary {
+        background: var(--red);
+        color: white;
+      }
+      .btn-primary:hover:not(:disabled) {
+        background: var(--red-dark);
+        transform: translateY(-1px);
+      }
+      .btn-primary:disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+      }
+      .btn-secondary {
+        background: var(--green);
+        color: white;
+      }
+      .btn-secondary:hover:not(:disabled) {
+        background: var(--green-dark);
+      }
+      .btn-ghost {
+        background: transparent;
+        border: 1.5px solid var(--border);
+        color: var(--text2);
+      }
+      .btn-ghost:hover {
+        border-color: var(--red);
+        color: var(--red);
+        background: var(--red-light);
+      }
+      .btn-sm {
+        padding: 7px 14px;
+        font-size: 13px;
+      }
+      .btn-full {
+        width: 100%;
+        justify-content: center;
+        margin-top: 8px;
+      }
+      /* ── IMAGE UPLOAD ── */
+      .img-upload-area {
+        border: 2px dashed var(--border);
+        border-radius: var(--radius);
+        padding: 20px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.2s;
+        background: var(--bg);
+      }
+      .img-upload-area:hover,
+      .img-upload-area.drag-over {
+        border-color: var(--red);
+        background: var(--red-light);
+      }
+      .img-upload-area input[type="file"] {
+        display: none;
+      }
+      .img-upload-area .upload-icon {
+        font-size: 2rem;
+        margin-bottom: 6px;
+      }
+      .img-upload-area p {
+        font-size: 13px;
+        color: var(--text2);
+      }
+      #imagePreview {
+        display: none;
+        max-width: 100%;
+        max-height: 200px;
+        margin-top: 10px;
+        border-radius: 8px;
+        object-fit: contain;
+      }
+      /* ── LIST MANAGEMENT ── */
+      .list-columns {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+      }
+      .list-box {
+        background: var(--bg);
+        border-radius: var(--radius);
+        padding: 20px;
+        border: 1px solid var(--border);
+      }
+      .list-box h3 {
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 14px;
+        color: var(--text2);
+      }
+      .input-row {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 12px;
+      }
+      .input-row input {
+        flex: 1;
+      }
+      .tag-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 12px;
+        background: white;
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        font-size: 13px;
+        color: var(--text);
+      }
+      .tag .del-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: var(--text2);
+        font-size: 15px;
+        line-height: 1;
+        padding: 0 0 0 2px;
+        transition: color 0.15s;
+      }
+      .tag .del-btn:hover {
+        color: var(--red);
+      }
+      /* ── VIEW PAGE ── */
+      .view-controls {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        align-items: flex-end;
+        margin-bottom: 20px;
+      }
+      .view-controls .form-group {
+        min-width: 180px;
+        flex: 1;
+      }
+      .stats-bar {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 12px;
+        margin-bottom: 20px;
+      }
+      .stat-card {
+        background: var(--white);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 14px 16px;
+      }
+      .stat-card .stat-val {
+        font-family: "Zen Kaku Gothic New", sans-serif;
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: var(--red);
+      }
+      .stat-card .stat-lbl {
+        font-size: 12px;
+        color: var(--text2);
+        margin-top: 2px;
+      }
+      /* ── TABLE ── */
+      .tbl-wrap {
+        overflow-x: auto;
+        border-radius: var(--radius);
+        border: 1px solid var(--border);
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 780px;
+        table-layout: fixed;
+      }
+      thead th {
+        background: var(--red);
+        color: white;
+        padding: 12px 14px;
+        text-align: left;
+        font-size: 13px;
+        font-weight: 500;
+      }
+      tbody td {
+        padding: 11px 14px;
+        font-size: 13px;
+        border-bottom: 1px solid var(--border);
+        vertical-align: middle;
+        word-break: break-word;
+      }
+      tbody tr:last-child td {
+        border-bottom: none;
+      }
+      tbody tr:hover {
+        background: var(--red-light);
+      }
+      th:nth-child(1),
+      td:nth-child(1) {
+        width: 70px;
+      }
+      th:nth-child(2),
+      td:nth-child(2) {
+        width: 15%;
+      }
+      th:nth-child(3),
+      td:nth-child(3) {
+        width: 12%;
+      }
+      th:nth-child(4),
+      td:nth-child(4) {
+        width: 6%;
+        text-align: center;
+      }
+      th:nth-child(5),
+      td:nth-child(5) {
+        width: 12%;
+      }
+      th:nth-child(6),
+      td:nth-child(6) {
+        width: 12%;
+      }
+      th:nth-child(7),
+      td:nth-child(7) {
+        width: 10%;
+      }
+      th:nth-child(8),
+      td:nth-child(8) {
+        width: 10%;
+      }
+      th:nth-child(9),
+      td:nth-child(9) {
+        width: auto;
+      }
+      .thumb {
+        width: 52px;
+        height: 52px;
+        object-fit: cover;
+        border-radius: 6px;
+        cursor: pointer;
+        border: 1px solid var(--border);
+      }
+      .thumb-placeholder {
+        width: 52px;
+        height: 52px;
+        border-radius: 6px;
+        background: var(--bg2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.4rem;
+        color: var(--border);
+      }
+      .badge {
+        display: inline-block;
+        padding: 3px 9px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 500;
+      }
+      .badge-cat {
+        background: #fef2f1;
+        color: var(--red);
+      }
+      .badge-place {
+        background: #e8f5e9;
+        color: #2d7d46;
+      }
+      .expiry-warn {
+        color: var(--red);
+        font-weight: 600;
+      }
+      .expiry-soon {
+        color: #b36f00;
+        font-weight: 600;
+      }
+      /* ── EMPTY / LOADING ── */
+      .empty {
+        padding: 48px 20px;
+        text-align: center;
+        color: var(--text2);
+      }
+      .empty-icon {
+        font-size: 3rem;
+        margin-bottom: 12px;
+      }
+      .spinner {
+        width: 20px;
+        height: 20px;
+        border: 2px solid rgba(255, 255, 255, 0.4);
+        border-radius: 50%;
+        border-top-color: white;
+        animation: spin 0.8s linear infinite;
+        display: inline-block;
+      }
+      .spinner-dark {
+        width: 20px;
+        height: 20px;
+        border: 2px solid var(--border);
+        border-radius: 50%;
+        border-top-color: var(--red);
+        animation: spin 0.8s linear infinite;
+        display: inline-block;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      /* ── TOAST ── */
+      #toast {
+        position: fixed;
+        bottom: 28px;
+        left: 50%;
+        transform: translateX(-50%) translateY(20px);
+        background: #2d2d2d;
+        color: white;
+        padding: 11px 22px;
+        border-radius: 24px;
+        font-size: 14px;
+        opacity: 0;
+        pointer-events: none;
+        transition: all 0.3s;
+        z-index: 9999;
+        white-space: nowrap;
+      }
+      #toast.show {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
+      #toast.success {
+        background: var(--green);
+      }
+      #toast.error {
+        background: var(--red);
+      }
+      /* ── MODAL (image preview) ── */
+      .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.55);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 500;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s;
+      }
+      .modal-overlay.open {
+        opacity: 1;
+        pointer-events: auto;
+      }
+      .modal-box {
+        background: white;
+        border-radius: 14px;
+        padding: 20px;
+        max-width: 90vw;
+        max-height: 90vh;
+        overflow: auto;
+        position: relative;
+      }
+      .modal-box img {
+        max-width: 80vw;
+        max-height: 70vh;
+        display: block;
+        border-radius: 8px;
+      }
+      .modal-close {
+        position: absolute;
+        top: 10px;
+        right: 14px;
+        background: none;
+        border: none;
+        font-size: 1.6rem;
+        cursor: pointer;
+        color: var(--text2);
+        line-height: 1;
+      }
+      /* ── RESPONSIVE ── */
+      @media (max-width: 720px) {
+        .app-header {
+          padding: 0 14px;
+        }
+        .nav-btn {
+          padding: 7px 11px;
+          font-size: 12px;
+        }
+        .form-row {
+          grid-template-columns: 1fr;
+        }
+        .list-columns {
+          grid-template-columns: 1fr;
+        }
+        .app-body {
+          padding: 16px 12px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- HEADER -->
+    <header class="app-header">
+      <div class="app-logo"><span>🏠</span> 備蓄管理アプリ</div>
+      <nav>
+        <button class="nav-btn active" onclick="showPage('registerPage', this)">
+          📝 登録
+        </button>
+        <button class="nav-btn" onclick="showPage('listPage', this)">
+          ⚙️ リスト
+        </button>
+        <button class="nav-btn" onclick="showPage('viewPage', this)">
+          📊 一覧
+        </button>
+      </nav>
+    </header>
+
+    <div class="app-body">
+      <!-- CONFIG BANNER -->
+      <div id="configBanner">
+        ⚠️ <strong>設定が必要です：</strong>このファイルの先頭にある
+        <code>SUPABASE_URL</code> と
+        <code>SUPABASE_ANON_KEY</code> を設定してください。
+        <a
+          href="#"
+          onclick="document.getElementById('setupModal').classList.add('open')"
+          >設定方法を見る</a
+        >
+      </div>
+
+      <!-- PAGE: 登録 -->
+      <section id="registerPage" class="page active">
+        <h2 class="page-title">📝 品目登録</h2>
+        <div class="card">
+          <div class="form-grid">
+            <!-- 画像 -->
+            <div class="form-group">
+              <label>画像</label>
+              <div
+                class="img-upload-area"
+                id="uploadArea"
+                onclick="document.getElementById('imgFile').click()"
+              >
+                <div class="upload-icon">📷</div>
+                <p>クリックまたはドラッグ＆ドロップで画像を選択</p>
+                <p style="font-size: 11px; margin-top: 4px">
+                  (JPG / PNG / WEBP — 最大5MB)
+                </p>
+                <input
+                  type="file"
+                  id="imgFile"
+                  accept="image/*"
+                  onchange="handleImageSelect(event)"
+                />
+              </div>
+              <img id="imagePreview" alt="プレビュー" />
+            </div>
+            <!-- 品名 -->
+            <div class="form-group req">
+              <label for="name">品名</label>
+              <input type="text" id="name" placeholder="例：非常用水 2L" />
+            </div>
+            <!-- カテゴリー・数量 -->
+            <div class="form-row">
+              <div class="form-group req">
+                <label for="category">カテゴリー</label>
+                <select id="category">
+                  <option value="">選択してください</option>
+                </select>
+              </div>
+              <div class="form-group req">
+                <label for="qty">数量</label>
+                <input type="number" id="qty" min="1" value="1" />
+              </div>
+            </div>
+            <!-- 保管場所・購入先 -->
+            <div class="form-row">
+              <div class="form-group req">
+                <label for="place">保管場所</label>
+                <select id="place">
+                  <option value="">選択してください</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="supplier">購入先</label>
+                <input type="text" id="supplier" placeholder="例：○○ストア" />
+              </div>
+            </div>
+            <!-- 購入日・使用期限 -->
+            <div class="form-row">
+              <div class="form-group">
+                <label for="purchaseDate">購入日</label>
+                <input type="date" id="purchaseDate" />
+              </div>
+              <div class="form-group">
+                <label for="expiry">使用期限</label>
+                <input type="date" id="expiry" />
+              </div>
+            </div>
+            <!-- メモ -->
+            <div class="form-group">
+              <label for="memo">メモ</label>
+              <textarea
+                id="memo"
+                placeholder="その他の情報があれば記入してください"
+              ></textarea>
+            </div>
+            <!-- ボタン -->
+            <button
+              class="btn btn-primary btn-full"
+              id="submitBtn"
+              onclick="saveItem()"
+            >
+              登録する
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- PAGE: リスト管理 -->
+      <section id="listPage" class="page">
+        <h2 class="page-title">⚙️ リスト管理</h2>
+        <div class="card">
+          <div class="list-columns">
+            <!-- カテゴリー -->
+            <div class="list-box">
+              <h3>📁 カテゴリー</h3>
+              <div class="input-row">
+                <input
+                  type="text"
+                  id="categoryInput"
+                  placeholder="新しいカテゴリー名"
+                />
+                <button
+                  class="btn btn-secondary btn-sm"
+                  onclick="addListItem('category')"
+                >
+                  追加
+                </button>
+              </div>
+              <div class="tag-list" id="categoryTags">
+                <span class="spinner-dark"></span>
+              </div>
+            </div>
+            <!-- 保管場所 -->
+            <div class="list-box">
+              <h3>📍 保管場所</h3>
+              <div class="input-row">
+                <input
+                  type="text"
+                  id="placeInput"
+                  placeholder="新しい保管場所名"
+                />
+                <button
+                  class="btn btn-secondary btn-sm"
+                  onclick="addListItem('place')"
+                >
+                  追加
+                </button>
+              </div>
+              <div class="tag-list" id="placeTags">
+                <span class="spinner-dark"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PAGE: 一覧 -->
+      <section id="viewPage" class="page">
+        <h2 class="page-title">📊 一覧表示</h2>
+        <!-- 統計 -->
+        <div class="stats-bar">
+          <div class="stat-card">
+            <div class="stat-val" id="statTotal">—</div>
+            <div class="stat-lbl">登録品目数</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-val" id="statExpired" style="color: var(--red)">
+              —
+            </div>
+            <div class="stat-lbl">期限切れ</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-val" id="statSoon" style="color: #b36f00">—</div>
+            <div class="stat-lbl">30日以内に期限</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-val" id="statQty">—</div>
+            <div class="stat-lbl">総数量</div>
+          </div>
+        </div>
+        <!-- フィルター -->
+        <div class="view-controls">
+          <div class="form-group" style="flex: 2; min-width: 200px">
+            <label for="searchInput">🔍 検索</label>
+            <input
+              type="text"
+              id="searchInput"
+              placeholder="品名・メモなど"
+              oninput="filterItems()"
+            />
+          </div>
+          <div class="form-group">
+            <label for="filterCat">カテゴリー</label>
+            <select id="filterCat" onchange="filterItems()">
+              <option value="">すべて</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="filterPlace">保管場所</label>
+            <select id="filterPlace" onchange="filterItems()">
+              <option value="">すべて</option>
+            </select>
+          </div>
+          <button
+            class="btn btn-ghost btn-sm"
+            onclick="loadItems()"
+            style="align-self: flex-end"
+          >
+            🔄 更新
+          </button>
+        </div>
+        <!-- テーブル -->
+        <div class="tbl-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>画像</th>
+                <th>品名</th>
+                <th>カテゴリー</th>
+                <th>数量</th>
+                <th>保管場所</th>
+                <th>購入先</th>
+                <th>購入日</th>
+                <th>使用期限</th>
+                <th>メモ</th>
+              </tr>
+            </thead>
+            <tbody id="itemsBody">
+              <tr>
+                <td colspan="9" class="empty">
+                  <span class="spinner-dark"></span> 読み込み中…
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast"></div>
+
+    <!-- Image modal -->
+    <div class="modal-overlay" id="imgModal" onclick="closeImgModal(event)">
+      <div class="modal-box">
+        <button
+          class="modal-close"
+          onclick="document.getElementById('imgModal').classList.remove('open')"
+        >
+          ✕
+        </button>
+        <img id="modalImg" src="" alt="" />
+      </div>
+    </div>
+
+    <!-- ========================================================
+     SCRIPT
+     ======================================================== -->
+    <script>
+      // ╔══════════════════════════════════════════════════════════╗
+      // ║  ★ 設定欄 ★                                             ║
+      // ║  Supabaseのプロジェクト設定から貼り付けてください         ║
+      // ╚══════════════════════════════════════════════════════════╝
+      const SUPABASE_URL = "https://qbamjdqronptilzxfekh.supabase.co/rest/v1/"; // 例: https://xxxx.supabase.co
+      const SUPABASE_ANON_KEY =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFiYW1qZHFyb25wdGlsenhmZWtoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5NjU1NDcsImV4cCI6MjA5NDU0MTU0N30.18YrEmqy35aJsfGR9AXgVLRZtySarsLoKLYGDBYaoXI"; // anon public key
+
+      // Supabase Storage バケット名
+      const BUCKET_NAME = "item-images";
+
+      // ── 初期化 ────────────────────────────────────────────
+      let supabase;
+      try {
+        if (
+          SUPABASE_URL.startsWith("YOUR_") ||
+          SUPABASE_ANON_KEY.startsWith("YOUR_")
+        ) {
+          document.getElementById("configBanner").style.display = "block";
+        } else {
+          supabase = window.supabase.createClient(
+            SUPABASE_URL,
+            SUPABASE_ANON_KEY,
+          );
+        }
+      } catch (e) {
+        document.getElementById("configBanner").style.display = "block";
+      }
+
+      let allItems = [];
+      let selectedImageFile = null;
+
+      // ── ページ切替 ────────────────────────────────────────
+      function showPage(id, btn) {
+        document
+          .querySelectorAll(".page")
+          .forEach((p) => p.classList.remove("active"));
+        document
+          .querySelectorAll(".nav-btn")
+          .forEach((b) => b.classList.remove("active"));
+        document.getElementById(id).classList.add("active");
+        if (btn) btn.classList.add("active");
+        if (id === "viewPage") loadItems();
+        if (id === "listPage") renderListPage();
+        if (id === "registerPage") loadSelectLists();
+      }
+
+      // ── Toast ─────────────────────────────────────────────
+      function toast(msg, type = "info", duration = 3000) {
+        const el = document.getElementById("toast");
+        el.textContent = msg;
+        el.className = "show " + type;
+        clearTimeout(el._timer);
+        el._timer = setTimeout(() => (el.className = ""), duration);
+      }
+
+      // ── 画像選択 ──────────────────────────────────────────
+      function handleImageSelect(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        if (file.size > 5 * 1024 * 1024) {
+          toast("画像は5MB以内にしてください", "error");
+          return;
+        }
+        selectedImageFile = file;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          const prev = document.getElementById("imagePreview");
+          prev.src = ev.target.result;
+          prev.style.display = "block";
+        };
+        reader.readAsDataURL(file);
+      }
+
+      // ドラッグ＆ドロップ
+      const uploadArea = document.getElementById("uploadArea");
+      uploadArea.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        uploadArea.classList.add("drag-over");
+      });
+      uploadArea.addEventListener("dragleave", () =>
+        uploadArea.classList.remove("drag-over"),
+      );
+      uploadArea.addEventListener("drop", (e) => {
+        e.preventDefault();
+        uploadArea.classList.remove("drag-over");
+        const file = e.dataTransfer.files[0];
+        if (file && file.type.startsWith("image/")) {
+          document.getElementById("imgFile").files = e.dataTransfer.files;
+          handleImageSelect({ target: { files: [file] } });
+        }
+      });
+
+      // ── 画像アップロード → Supabase Storage ─────────────
+      async function uploadImage(file) {
+        if (!supabase) return null;
+        const ext = file.name.split(".").pop();
+        const path = `${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
+        const { error } = await supabase.storage
+          .from(BUCKET_NAME)
+          .upload(path, file, { upsert: false });
+        if (error) throw error;
+        const { data } = supabase.storage.from(BUCKET_NAME).getPublicUrl(path);
+        return data.publicUrl;
+      }
+
+      // ── 品目登録 ──────────────────────────────────────────
+      async function saveItem() {
+        if (!supabase) {
+          toast("Supabaseが設定されていません", "error");
+          return;
+        }
+        const name = document.getElementById("name").value.trim();
+        const category = document.getElementById("category").value;
+        const place = document.getElementById("place").value;
+        const qty = parseInt(document.getElementById("qty").value) || 1;
+        if (!name || !category || !place) {
+          toast("必須項目を入力してください", "error");
+          return;
+        }
+
+        const btn = document.getElementById("submitBtn");
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner"></span> 登録中…';
+
+        try {
+          let imageUrl = null;
+          if (selectedImageFile)
+            imageUrl = await uploadImage(selectedImageFile);
+
+          const { error } = await supabase.from("items").insert([
+            {
+              name,
+              category,
+              place,
+              qty,
+              supplier:
+                document.getElementById("supplier").value.trim() || null,
+              purchase_date:
+                document.getElementById("purchaseDate").value || null,
+              expiry: document.getElementById("expiry").value || null,
+              memo: document.getElementById("memo").value.trim() || null,
+              image_url: imageUrl,
+            },
+          ]);
+          if (error) throw error;
+          toast("登録しました！", "success");
+          resetForm();
+        } catch (e) {
+          toast("エラー: " + e.message, "error");
+        } finally {
+          btn.disabled = false;
+          btn.textContent = "登録する";
+        }
+      }
+
+      function resetForm() {
+        ["name", "supplier", "purchaseDate", "expiry", "memo"].forEach(
+          (id) => (document.getElementById(id).value = ""),
+        );
+        document.getElementById("qty").value = 1;
+        document.getElementById("category").value = "";
+        document.getElementById("place").value = "";
+        document.getElementById("imagePreview").style.display = "none";
+        document.getElementById("imagePreview").src = "";
+        document.getElementById("imgFile").value = "";
+        selectedImageFile = null;
+      }
+
+      // ── セレクト用リスト読み込み ─────────────────────────
+      async function loadSelectLists() {
+        if (!supabase) return;
+        const { data: cats } = await supabase
+          .from("categories")
+          .select("name")
+          .order("name");
+        const { data: places } = await supabase
+          .from("places")
+          .select("name")
+          .order("name");
+        populateSelect("category", cats || []);
+        populateSelect("place", places || []);
+      }
+
+      function populateSelect(id, items) {
+        const sel = document.getElementById(id);
+        const current = sel.value;
+        sel.innerHTML = '<option value="">選択してください</option>';
+        items.forEach((i) => sel.appendChild(new Option(i.name, i.name)));
+        sel.value = current;
+      }
+
+      // ── リストページ ──────────────────────────────────────
+      async function renderListPage() {
+        if (!supabase) return;
+        const { data: cats } = await supabase
+          .from("categories")
+          .select("*")
+          .order("name");
+        const { data: places } = await supabase
+          .from("places")
+          .select("*")
+          .order("name");
+        renderTags("categoryTags", cats || [], "category");
+        renderTags("placeTags", places || [], "place");
+      }
+
+      function renderTags(containerId, items, type) {
+        const container = document.getElementById(containerId);
+        if (!items.length) {
+          container.innerHTML =
+            '<span style="font-size:13px;color:var(--text2);">まだ登録がありません</span>';
+          return;
+        }
+        container.innerHTML = items
+          .map(
+            (item) => `
+    <span class="tag">
+      ${escapeHtml(item.name)}
+      <button class="del-btn" title="削除" onclick="deleteListItem('${type}', ${item.id}, '${escapeHtml(item.name)}')">×</button>
+    </span>
+  `,
+          )
+          .join("");
+      }
+
+      async function addListItem(type) {
+        if (!supabase) return;
+        const inputId = type === "category" ? "categoryInput" : "placeInput";
+        const table = type === "category" ? "categories" : "places";
+        const value = document.getElementById(inputId).value.trim();
+        if (!value) {
+          toast("名前を入力してください", "error");
+          return;
+        }
+
+        const { error } = await supabase.from(table).insert([{ name: value }]);
+        if (error) {
+          toast(
+            error.message.includes("unique")
+              ? "既に存在しています"
+              : "エラー: " + error.message,
+            "error",
+          );
+          return;
+        }
+        document.getElementById(inputId).value = "";
+        toast("追加しました！", "success");
+        renderListPage();
+        loadSelectLists();
+      }
+
+      async function deleteListItem(type, id, name) {
+        if (!confirm(`「${name}」を削除しますか？`)) return;
+        const table = type === "category" ? "categories" : "places";
+        const { error } = await supabase.from(table).delete().eq("id", id);
+        if (error) {
+          toast("削除エラー: " + error.message, "error");
+          return;
+        }
+        toast("削除しました", "success");
+        renderListPage();
+        loadSelectLists();
+      }
+
+      // ── 一覧ページ ────────────────────────────────────────
+      async function loadItems() {
+        if (!supabase) return;
+        const tbody = document.getElementById("itemsBody");
+        tbody.innerHTML =
+          '<tr><td colspan="9" class="empty"><span class="spinner-dark"></span> 読み込み中…</td></tr>';
+
+        const { data, error } = await supabase
+          .from("items")
+          .select("*")
+          .order("created_at", { ascending: false });
+        if (error) {
+          tbody.innerHTML = `<tr><td colspan="9" class="empty" style="color:var(--red)">読み込みに失敗しました: ${error.message}</td></tr>`;
+          return;
+        }
+        allItems = data || [];
+
+        // フィルターセレクト更新
+        const cats = [
+          ...new Set(allItems.map((i) => i.category).filter(Boolean)),
+        ].sort();
+        const plcs = [
+          ...new Set(allItems.map((i) => i.place).filter(Boolean)),
+        ].sort();
+        const fc = document.getElementById("filterCat");
+        const fp = document.getElementById("filterPlace");
+        fc.innerHTML = '<option value="">すべて</option>';
+        fp.innerHTML = '<option value="">すべて</option>';
+        cats.forEach((c) => fc.appendChild(new Option(c, c)));
+        plcs.forEach((p) => fp.appendChild(new Option(p, p)));
+
+        updateStats(allItems);
+        filterItems();
+      }
+
+      function updateStats(items) {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const d30 = new Date(today);
+        d30.setDate(d30.getDate() + 30);
+        let expired = 0,
+          soon = 0,
+          totalQty = 0;
+        items.forEach((item) => {
+          totalQty += item.qty || 0;
+          if (item.expiry) {
+            const exp = new Date(item.expiry);
+            if (exp < today) expired++;
+            else if (exp <= d30) soon++;
+          }
+        });
+        document.getElementById("statTotal").textContent = items.length;
+        document.getElementById("statExpired").textContent = expired;
+        document.getElementById("statSoon").textContent = soon;
+        document.getElementById("statQty").textContent = totalQty;
+      }
+
+      function filterItems() {
+        const kw = document.getElementById("searchInput").value.toLowerCase();
+        const cat = document.getElementById("filterCat").value;
+        const plc = document.getElementById("filterPlace").value;
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const d30 = new Date(today);
+        d30.setDate(d30.getDate() + 30);
+
+        let filtered = allItems.filter((item) => {
+          const matchKw =
+            !kw ||
+            [
+              item.name,
+              item.memo,
+              item.supplier,
+              item.category,
+              item.place,
+            ].some((v) => v?.toLowerCase().includes(kw));
+          return (
+            matchKw &&
+            (!cat || item.category === cat) &&
+            (!plc || item.place === plc)
+          );
+        });
+
+        filtered.sort((a, b) => {
+          const ea = a.expiry ? new Date(a.expiry) : null;
+          const eb = b.expiry ? new Date(b.expiry) : null;
+          const expA = ea && ea < today,
+            expB = eb && eb < today;
+          if (expA && !expB) return -1;
+          if (!expA && expB) return 1;
+          if (ea && eb) return ea - eb;
+          if (ea) return -1;
+          if (eb) return 1;
+          return (a.name || "").localeCompare(b.name || "", "ja");
+        });
+
+        displayItems(filtered, today, d30);
+      }
+
+      function displayItems(items, today, d30) {
+        const tbody = document.getElementById("itemsBody");
+        if (!items.length) {
+          tbody.innerHTML =
+            '<tr><td colspan="9" class="empty"><div class="empty-icon">📦</div>一致する品目がありません</td></tr>';
+          return;
+        }
+        tbody.innerHTML = items
+          .map((item) => {
+            const imgCell = item.image_url
+              ? `<img class="thumb" src="${escapeHtml(item.image_url)}" alt="${escapeHtml(item.name)}" onclick="openImgModal('${escapeHtml(item.image_url)}')" loading="lazy">`
+              : `<div class="thumb-placeholder">📦</div>`;
+
+            let expClass = "",
+              expText = escapeHtml(item.expiry || "");
+            if (item.expiry) {
+              const exp = new Date(item.expiry);
+              if (exp < today) {
+                expClass = "expiry-warn";
+                expText += " ⚠️";
+              } else if (exp <= d30) {
+                expClass = "expiry-soon";
+                expText += " 📅";
+              }
+            }
+            return `<tr>
+      <td>${imgCell}</td>
+      <td><strong>${escapeHtml(item.name)}</strong></td>
+      <td><span class="badge badge-cat">${escapeHtml(item.category)}</span></td>
+      <td style="text-align:center;font-weight:600;color:var(--red)">${item.qty || 0}</td>
+      <td><span class="badge badge-place">${escapeHtml(item.place)}</span></td>
+      <td>${escapeHtml(item.supplier || "")}</td>
+      <td>${escapeHtml(item.purchase_date || "")}</td>
+      <td class="${expClass}">${expText}</td>
+      <td style="color:var(--text2)">${escapeHtml(item.memo || "")}</td>
+    </tr>`;
+          })
+          .join("");
+      }
+
+      // ── 画像モーダル ──────────────────────────────────────
+      function openImgModal(url) {
+        document.getElementById("modalImg").src = url;
+        document.getElementById("imgModal").classList.add("open");
+      }
+      function closeImgModal(e) {
+        if (e.target === document.getElementById("imgModal"))
+          document.getElementById("imgModal").classList.remove("open");
+      }
+
+      // ── ユーティリティ ────────────────────────────────────
+      function escapeHtml(str) {
+        if (str == null) return "";
+        return String(str)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;");
+      }
+
+      // ── 起動 ─────────────────────────────────────────────
+      document.addEventListener("DOMContentLoaded", () => {
+        if (supabase) {
+          loadSelectLists();
+        }
+        // Enterキー制御
+        document
+          .querySelectorAll('input[type="text"], input[type="number"]')
+          .forEach((el) => {
+            el.addEventListener("keydown", (e) => {
+              if (e.key === "Enter") e.preventDefault();
+            });
+          });
+      });
+    </script>
+  </body>
+</html>
