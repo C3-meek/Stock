@@ -891,13 +891,13 @@
       // ╚══════════════════════════════════════════════════════════╝
       const SUPABASE_URL = "https://qbamjdqronptilzxfekh.supabase.co/rest/v1/"; // 例: https://xxxx.supabase.co
       const SUPABASE_ANON_KEY =
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFiYW1qZHFyb25wdGlsenhmZWtoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5NjU1NDcsImV4cCI6MjA5NDU0MTU0N30.18YrEmqy35aJsfGR9AXgVLRZtySarsLoKLYGDBYaoXI"; // anon public key
+        "sb_publishable_WZRG9miBs0E8zC7Y8gYiGw_7IJjMcmc"; // anon public key
 
       // Supabase Storage バケット名
       const BUCKET_NAME = "item-images";
 
       // ── 初期化 ────────────────────────────────────────────
-      let supabase;
+      let db;
       try {
         if (
           SUPABASE_URL.startsWith("YOUR_") ||
@@ -905,10 +905,7 @@
         ) {
           document.getElementById("configBanner").style.display = "block";
         } else {
-          supabase = window.supabase.createClient(
-            SUPABASE_URL,
-            SUPABASE_ANON_KEY,
-          );
+          db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         }
       } catch (e) {
         document.getElementById("configBanner").style.display = "block";
@@ -980,20 +977,20 @@
 
       // ── 画像アップロード → Supabase Storage ─────────────
       async function uploadImage(file) {
-        if (!supabase) return null;
+        if (!db) return null;
         const ext = file.name.split(".").pop();
         const path = `${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
-        const { error } = await supabase.storage
+        const { error } = await db.storage
           .from(BUCKET_NAME)
           .upload(path, file, { upsert: false });
         if (error) throw error;
-        const { data } = supabase.storage.from(BUCKET_NAME).getPublicUrl(path);
+        const { data } = db.storage.from(BUCKET_NAME).getPublicUrl(path);
         return data.publicUrl;
       }
 
       // ── 品目登録 ──────────────────────────────────────────
       async function saveItem() {
-        if (!supabase) {
+        if (!db) {
           toast("Supabaseが設定されていません", "error");
           return;
         }
@@ -1015,7 +1012,7 @@
           if (selectedImageFile)
             imageUrl = await uploadImage(selectedImageFile);
 
-          const { error } = await supabase.from("items").insert([
+          const { error } = await db.from("items").insert([
             {
               name,
               category,
@@ -1056,12 +1053,12 @@
 
       // ── セレクト用リスト読み込み ─────────────────────────
       async function loadSelectLists() {
-        if (!supabase) return;
-        const { data: cats } = await supabase
+        if (!db) return;
+        const { data: cats } = await db
           .from("categories")
           .select("name")
           .order("name");
-        const { data: places } = await supabase
+        const { data: places } = await db
           .from("places")
           .select("name")
           .order("name");
@@ -1079,12 +1076,12 @@
 
       // ── リストページ ──────────────────────────────────────
       async function renderListPage() {
-        if (!supabase) return;
-        const { data: cats } = await supabase
+        if (!db) return;
+        const { data: cats } = await db
           .from("categories")
           .select("*")
           .order("name");
-        const { data: places } = await supabase
+        const { data: places } = await db
           .from("places")
           .select("*")
           .order("name");
@@ -1112,7 +1109,7 @@
       }
 
       async function addListItem(type) {
-        if (!supabase) return;
+        if (!db) return;
         const inputId = type === "category" ? "categoryInput" : "placeInput";
         const table = type === "category" ? "categories" : "places";
         const value = document.getElementById(inputId).value.trim();
@@ -1121,7 +1118,7 @@
           return;
         }
 
-        const { error } = await supabase.from(table).insert([{ name: value }]);
+        const { error } = await db.from(table).insert([{ name: value }]);
         if (error) {
           toast(
             error.message.includes("unique")
@@ -1140,7 +1137,7 @@
       async function deleteListItem(type, id, name) {
         if (!confirm(`「${name}」を削除しますか？`)) return;
         const table = type === "category" ? "categories" : "places";
-        const { error } = await supabase.from(table).delete().eq("id", id);
+        const { error } = await db.from(table).delete().eq("id", id);
         if (error) {
           toast("削除エラー: " + error.message, "error");
           return;
@@ -1152,12 +1149,12 @@
 
       // ── 一覧ページ ────────────────────────────────────────
       async function loadItems() {
-        if (!supabase) return;
+        if (!db) return;
         const tbody = document.getElementById("itemsBody");
         tbody.innerHTML =
           '<tr><td colspan="9" class="empty"><span class="spinner-dark"></span> 読み込み中…</td></tr>';
 
-        const { data, error } = await supabase
+        const { data, error } = await db
           .from("items")
           .select("*")
           .order("created_at", { ascending: false });
