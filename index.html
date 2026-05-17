@@ -593,6 +593,51 @@
         color: var(--text2);
         line-height: 1;
       }
+      /* ── ACTION BUTTONS ── */
+      .btn-consumed {
+        background: #e8f5e9;
+        color: #2d7d46;
+        border: 1px solid #a5d6a7;
+      }
+      .btn-consumed:hover {
+        background: #c8e6c9;
+      }
+      .btn-delete {
+        background: #fef2f1;
+        color: var(--red);
+        border: 1px solid #ffcdd2;
+      }
+      .btn-delete:hover {
+        background: #ffcdd2;
+      }
+      .btn-restore {
+        background: #fff8e1;
+        color: #b36f00;
+        border: 1px solid #ffe082;
+      }
+      .btn-restore:hover {
+        background: #ffe082;
+      }
+      .action-btns {
+        display: flex;
+        gap: 5px;
+        flex-wrap: wrap;
+      }
+      /* 消費済み行 */
+      tr.consumed-row td {
+        opacity: 0.5;
+        text-decoration: line-through;
+      }
+      tr.consumed-row td:last-child {
+        text-decoration: none;
+      }
+      .badge-consumed {
+        background: #f5f5f5;
+        color: #999;
+        font-size: 11px;
+        padding: 2px 7px;
+        border-radius: 10px;
+      }
       /* ── RESPONSIVE ── */
       @media (max-width: 720px) {
         .app-header {
@@ -805,6 +850,12 @@
             <div class="stat-val" id="statQty">—</div>
             <div class="stat-lbl">総数量</div>
           </div>
+          <div class="stat-card">
+            <div class="stat-val" id="statConsumed" style="color: #2d7d46">
+              —
+            </div>
+            <div class="stat-lbl">消費済み</div>
+          </div>
         </div>
         <!-- フィルター -->
         <div class="view-controls">
@@ -837,6 +888,25 @@
             🔄 更新
           </button>
         </div>
+        <div style="margin-bottom: 12px">
+          <label
+            style="
+              display: inline-flex;
+              align-items: center;
+              gap: 8px;
+              font-size: 13px;
+              cursor: pointer;
+            "
+          >
+            <input
+              type="checkbox"
+              id="showConsumed"
+              onchange="filterItems()"
+              style="width: 16px; height: 16px"
+            />
+            消費済みも表示する
+          </label>
+        </div>
         <!-- テーブル -->
         <div class="tbl-wrap">
           <table>
@@ -851,11 +921,12 @@
                 <th>購入日</th>
                 <th>使用期限</th>
                 <th>メモ</th>
+                <th>操作</th>
               </tr>
             </thead>
             <tbody id="itemsBody">
               <tr>
-                <td colspan="9" class="empty">
+                <td colspan="10" class="empty">
                   <span class="spinner-dark"></span> 読み込み中…
                 </td>
               </tr>
@@ -1152,24 +1223,26 @@
         if (!db) return;
         const tbody = document.getElementById("itemsBody");
         tbody.innerHTML =
-          '<tr><td colspan="9" class="empty"><span class="spinner-dark"></span> 読み込み中…</td></tr>';
+          '<tr><td colspan="10" class="empty"><span class="spinner-dark"></span> 読み込み中…</td></tr>';
 
+        // status が null の古いデータも含めて全件取得
         const { data, error } = await db
           .from("items")
           .select("*")
           .order("created_at", { ascending: false });
         if (error) {
-          tbody.innerHTML = `<tr><td colspan="9" class="empty" style="color:var(--red)">読み込みに失敗しました: ${error.message}</td></tr>`;
+          tbody.innerHTML = `<tr><td colspan="10" class="empty" style="color:var(--red)">読み込みに失敗しました: ${error.message}</td></tr>`;
           return;
         }
         allItems = data || [];
 
-        // フィルターセレクト更新
+        // フィルターセレクト更新（削除済み除く）
+        const active = allItems.filter((i) => i.status !== "deleted");
         const cats = [
-          ...new Set(allItems.map((i) => i.category).filter(Boolean)),
+          ...new Set(active.map((i) => i.category).filter(Boolean)),
         ].sort();
         const plcs = [
-          ...new Set(allItems.map((i) => i.place).filter(Boolean)),
+          ...new Set(active.map((i) => i.place).filter(Boolean)),
         ].sort();
         const fc = document.getElementById("filterCat");
         const fp = document.getElementById("filterPlace");
@@ -1189,8 +1262,14 @@
         d30.setDate(d30.getDate() + 30);
         let expired = 0,
           soon = 0,
-          totalQty = 0;
+          totalQty = 0,
+          consumed = 0;
         items.forEach((item) => {
+          if (item.status === "deleted") return;
+          if (item.status === "consumed") {
+            consumed++;
+            return;
+          }
           totalQty += item.qty || 0;
           if (item.expiry) {
             const exp = new Date(item.expiry);
@@ -1198,22 +1277,29 @@
             else if (exp <= d30) soon++;
           }
         });
-        document.getElementById("statTotal").textContent = items.length;
+        const activeCount = items.filter(
+          (i) => i.status !== "deleted" && i.status !== "consumed",
+        ).length;
+        document.getElementById("statTotal").textContent = activeCount;
         document.getElementById("statExpired").textContent = expired;
         document.getElementById("statSoon").textContent = soon;
         document.getElementById("statQty").textContent = totalQty;
+        document.getElementById("statConsumed").textContent = consumed;
       }
 
       function filterItems() {
         const kw = document.getElementById("searchInput").value.toLowerCase();
         const cat = document.getElementById("filterCat").value;
         const plc = document.getElementById("filterPlace").value;
+        const showConsumed = document.getElementById("showConsumed").checked;
         const today = new Date();
         today.setHours(0, 0, 0, 0);
         const d30 = new Date(today);
         d30.setDate(d30.getDate() + 30);
 
         let filtered = allItems.filter((item) => {
+          if (item.status === "deleted") return false;
+          if (item.status === "consumed" && !showConsumed) return false;
           const matchKw =
             !kw ||
             [
@@ -1231,6 +1317,9 @@
         });
 
         filtered.sort((a, b) => {
+          // 消費済みは末尾
+          if (a.status === "consumed" && b.status !== "consumed") return 1;
+          if (a.status !== "consumed" && b.status === "consumed") return -1;
           const ea = a.expiry ? new Date(a.expiry) : null;
           const eb = b.expiry ? new Date(b.expiry) : null;
           const expA = ea && ea < today,
@@ -1250,18 +1339,19 @@
         const tbody = document.getElementById("itemsBody");
         if (!items.length) {
           tbody.innerHTML =
-            '<tr><td colspan="9" class="empty"><div class="empty-icon">📦</div>一致する品目がありません</td></tr>';
+            '<tr><td colspan="10" class="empty"><div class="empty-icon">📦</div>一致する品目がありません</td></tr>';
           return;
         }
         tbody.innerHTML = items
           .map((item) => {
+            const isConsumed = item.status === "consumed";
             const imgCell = item.image_url
               ? `<img class="thumb" src="${escapeHtml(item.image_url)}" alt="${escapeHtml(item.name)}" onclick="openImgModal('${escapeHtml(item.image_url)}')" loading="lazy">`
               : `<div class="thumb-placeholder">📦</div>`;
 
             let expClass = "",
               expText = escapeHtml(item.expiry || "");
-            if (item.expiry) {
+            if (!isConsumed && item.expiry) {
               const exp = new Date(item.expiry);
               if (exp < today) {
                 expClass = "expiry-warn";
@@ -1271,9 +1361,25 @@
                 expText += " 📅";
               }
             }
-            return `<tr>
+
+            // 操作ボタン
+            const actionBtns = isConsumed
+              ? `<div class="action-btns">
+           <button class="btn btn-sm btn-restore" onclick="updateStatus(${item.id},'active')">↩ 戻す</button>
+           <button class="btn btn-sm btn-delete"  onclick="deleteItem(${item.id}, '${escapeHtml(item.name)}')">🗑 削除</button>
+         </div>`
+              : `<div class="action-btns">
+           <button class="btn btn-sm btn-consumed" onclick="updateStatus(${item.id},'consumed')">✅ 消費済み</button>
+           <button class="btn btn-sm btn-delete"   onclick="deleteItem(${item.id}, '${escapeHtml(item.name)}')">🗑 削除</button>
+         </div>`;
+
+            const consumedBadge = isConsumed
+              ? '<span class="badge-consumed">消費済み</span> '
+              : "";
+
+            return `<tr class="${isConsumed ? "consumed-row" : ""}">
       <td>${imgCell}</td>
-      <td><strong>${escapeHtml(item.name)}</strong></td>
+      <td><strong>${consumedBadge}${escapeHtml(item.name)}</strong></td>
       <td><span class="badge badge-cat">${escapeHtml(item.category)}</span></td>
       <td style="text-align:center;font-weight:600;color:var(--red)">${item.qty || 0}</td>
       <td><span class="badge badge-place">${escapeHtml(item.place)}</span></td>
@@ -1281,9 +1387,45 @@
       <td>${escapeHtml(item.purchase_date || "")}</td>
       <td class="${expClass}">${expText}</td>
       <td style="color:var(--text2)">${escapeHtml(item.memo || "")}</td>
+      <td>${actionBtns}</td>
     </tr>`;
           })
           .join("");
+      }
+
+      // ── ステータス更新（消費済み / 元に戻す）────────────
+      async function updateStatus(id, status) {
+        if (!db) return;
+        const { error } = await db
+          .from("items")
+          .update({ status })
+          .eq("id", id);
+        if (error) {
+          toast("更新エラー: " + error.message, "error");
+          return;
+        }
+        toast(
+          status === "consumed" ? "消費済みにしました ✅" : "元に戻しました",
+          "success",
+        );
+        loadItems();
+      }
+
+      // ── 削除（物理削除）─────────────────────────────────
+      async function deleteItem(id, name) {
+        if (
+          !confirm(
+            `「${name}」を完全に削除しますか？\nこの操作は元に戻せません。`,
+          )
+        )
+          return;
+        const { error } = await db.from("items").delete().eq("id", id);
+        if (error) {
+          toast("削除エラー: " + error.message, "error");
+          return;
+        }
+        toast("削除しました", "success");
+        loadItems();
       }
 
       // ── 画像モーダル ──────────────────────────────────────
@@ -1308,7 +1450,7 @@
 
       // ── 起動 ─────────────────────────────────────────────
       document.addEventListener("DOMContentLoaded", () => {
-        if (supabase) {
+        if (db) {
           loadSelectLists();
         }
         // Enterキー制御
