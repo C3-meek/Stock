@@ -876,6 +876,63 @@
               </div>
             </div>
             <div class="form-group">
+              <label for="warnDaysItem"
+                >注意日数（空欄 = デフォルト設定を使用）</label
+              >
+              <div
+                style="
+                  display: flex;
+                  gap: 8px;
+                  align-items: center;
+                  flex-wrap: wrap;
+                "
+              >
+                <input
+                  type="number"
+                  id="warnDaysItem"
+                  min="1"
+                  max="999"
+                  placeholder="例：60"
+                  style="max-width: 120px"
+                />
+                <span style="font-size: 12px; color: var(--text2)"
+                  >日前から「注意」表示</span
+                >
+                <div style="display: flex; gap: 6px">
+                  <button
+                    type="button"
+                    class="btn btn-ghost btn-sm"
+                    onclick="document.getElementById('warnDaysItem').value = 30"
+                  >
+                    30
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-ghost btn-sm"
+                    onclick="document.getElementById('warnDaysItem').value = 60"
+                  >
+                    60
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-ghost btn-sm"
+                    onclick="document.getElementById('warnDaysItem').value = 90"
+                  >
+                    90
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-ghost btn-sm"
+                    onclick="
+                      document.getElementById('warnDaysItem').value = 180
+                    "
+                  >
+                    180
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="form-group">
               <label for="memo">メモ</label
               ><textarea
                 id="memo"
@@ -908,7 +965,10 @@
             "
           >
             <div style="font-size: 14px; font-weight: 600; color: var(--text2)">
-              📅 「注意」表示の期限しきい値
+              📅 「注意」表示のデフォルト日数<br /><span
+                style="font-size: 11px; font-weight: 400"
+                >※アイテムごとに注意日数を設定していない場合に使われます</span
+              >
             </div>
             <div style="display: flex; gap: 8px; flex-wrap: wrap">
               <button
@@ -1257,6 +1317,61 @@
             </div>
           </div>
           <div class="form-group">
+            <label for="editWarnDays"
+              >注意日数（空欄 = デフォルト設定を使用）</label
+            >
+            <div
+              style="
+                display: flex;
+                gap: 8px;
+                align-items: center;
+                flex-wrap: wrap;
+              "
+            >
+              <input
+                type="number"
+                id="editWarnDays"
+                min="1"
+                max="999"
+                placeholder="例：60"
+                style="max-width: 120px"
+              />
+              <span style="font-size: 12px; color: var(--text2)"
+                >日前から「注意」表示</span
+              >
+              <div style="display: flex; gap: 6px">
+                <button
+                  type="button"
+                  class="btn btn-ghost btn-sm"
+                  onclick="document.getElementById('editWarnDays').value = 30"
+                >
+                  30
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-ghost btn-sm"
+                  onclick="document.getElementById('editWarnDays').value = 60"
+                >
+                  60
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-ghost btn-sm"
+                  onclick="document.getElementById('editWarnDays').value = 90"
+                >
+                  90
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-ghost btn-sm"
+                  onclick="document.getElementById('editWarnDays').value = 180"
+                >
+                  180
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
             <label for="editMemo">メモ</label
             ><textarea id="editMemo"></textarea>
           </div>
@@ -1405,6 +1520,8 @@
               purchase_date:
                 document.getElementById("purchaseDate").value || null,
               expiry: document.getElementById("expiry").value || null,
+              warn_days:
+                parseInt(document.getElementById("warnDaysItem").value) || null,
               memo: document.getElementById("memo").value.trim() || null,
               image_url: imageUrl,
             },
@@ -1421,9 +1538,14 @@
       }
 
       function resetRegisterForm() {
-        ["name", "supplier", "purchaseDate", "expiry", "memo"].forEach(
-          (id) => (document.getElementById(id).value = ""),
-        );
+        [
+          "name",
+          "supplier",
+          "purchaseDate",
+          "expiry",
+          "memo",
+          "warnDaysItem",
+        ].forEach((id) => (document.getElementById(id).value = ""));
         document.getElementById("qty").value = 1;
         document.getElementById("category").value = "";
         document.getElementById("place").value = "";
@@ -1550,11 +1672,17 @@
         filterItems();
       }
 
+      function getWarnDate(item, today) {
+        const days =
+          item.warn_days && item.warn_days > 0 ? item.warn_days : WARN_DAYS;
+        const d = new Date(today);
+        d.setDate(d.getDate() + days);
+        return d;
+      }
+
       function updateStats(items) {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
-        const dWarn = new Date(today);
-        dWarn.setDate(dWarn.getDate() + WARN_DAYS);
         let expired = 0,
           soon = 0,
           totalQty = 0,
@@ -1568,6 +1696,7 @@
           totalQty += item.qty || 0;
           if (item.expiry) {
             const exp = new Date(item.expiry);
+            const dWarn = getWarnDate(item, today);
             if (exp < today) expired++;
             else if (exp <= dWarn) soon++;
           }
@@ -1578,8 +1707,7 @@
         document.getElementById("statTotal").textContent = ac;
         document.getElementById("statExpired").textContent = expired;
         document.getElementById("statSoon").textContent = soon;
-        document.getElementById("statSoonLbl").textContent =
-          `⚠️ 注意（${WARN_DAYS}日以内）`;
+        document.getElementById("statSoonLbl").textContent = "⚠️ 注意";
         document.getElementById("statQty").textContent = totalQty;
         document.getElementById("statConsumed").textContent = consumed;
       }
@@ -1619,8 +1747,6 @@
         const showConsumed = document.getElementById("showConsumed").checked;
         const today = new Date();
         today.setHours(0, 0, 0, 0);
-        const dWarn = new Date(today);
-        dWarn.setDate(dWarn.getDate() + WARN_DAYS);
 
         let filtered = allItems.filter((item) => {
           if (item.status === "deleted") return false;
@@ -1631,6 +1757,7 @@
             if (item.status === "consumed") return false;
             if (!item.expiry) return false;
             const exp = new Date(item.expiry);
+            const dWarn = getWarnDate(item, today);
             if (exp < today || exp > dWarn) return false;
           } else if (activeStatFilter === "consumed") {
             if (item.status !== "consumed") return false;
@@ -1667,15 +1794,16 @@
           if (eb) return 1;
           return (a.name || "").localeCompare(b.name || "", "ja");
         });
-        displayItems(filtered, today, dWarn);
-        displayCards(filtered, today, dWarn);
+        displayItems(filtered, today);
+        displayCards(filtered, today);
       }
 
-      function buildExpiry(item, today, dWarn, isConsumed) {
+      function buildExpiry(item, today, isConsumed) {
         let expClass = "",
           expText = escapeHtml(item.expiry || "");
         if (!isConsumed && item.expiry) {
           const exp = new Date(item.expiry);
+          const dWarn = getWarnDate(item, today);
           if (exp < today) {
             expClass = "expiry-warn";
             expText += " ⚠️";
@@ -1687,7 +1815,7 @@
         return { expClass, expText };
       }
 
-      function displayItems(items, today, d30) {
+      function displayItems(items, today) {
         const tbody = document.getElementById("itemsBody");
         if (!items.length) {
           tbody.innerHTML =
@@ -1697,12 +1825,7 @@
         tbody.innerHTML = items
           .map((item) => {
             const isConsumed = item.status === "consumed";
-            const { expClass, expText } = buildExpiry(
-              item,
-              today,
-              d30,
-              isConsumed,
-            );
+            const { expClass, expText } = buildExpiry(item, today, isConsumed);
             const imgCell = item.image_url
               ? `<img class="thumb" src="${escapeHtml(item.image_url)}" onclick="openImgModal('${escapeHtml(item.image_url)}')" loading="lazy">`
               : `<div class="thumb-ph">📦</div>`;
@@ -1727,7 +1850,7 @@
           .join("");
       }
 
-      function displayCards(items, today, d30) {
+      function displayCards(items, today) {
         const cl = document.getElementById("cardList");
         if (!items.length) {
           cl.innerHTML =
@@ -1737,12 +1860,7 @@
         cl.innerHTML = items
           .map((item) => {
             const isConsumed = item.status === "consumed";
-            const { expClass, expText } = buildExpiry(
-              item,
-              today,
-              d30,
-              isConsumed,
-            );
+            const { expClass, expText } = buildExpiry(item, today, isConsumed);
             const imgHtml = item.image_url
               ? `<img class="card-thumb" src="${escapeHtml(item.image_url)}" onclick="openImgModal('${escapeHtml(item.image_url)}')" loading="lazy">`
               : `<div class="card-thumb-ph">📦</div>`;
@@ -1784,6 +1902,7 @@
         document.getElementById("editPurchaseDate").value =
           item.purchase_date || "";
         document.getElementById("editExpiry").value = item.expiry || "";
+        document.getElementById("editWarnDays").value = item.warn_days || "";
         document.getElementById("editMemo").value = item.memo || "";
         document.getElementById("editCategory").value = item.category || "";
         document.getElementById("editPlace").value = item.place || "";
@@ -1827,6 +1946,8 @@
               purchase_date:
                 document.getElementById("editPurchaseDate").value || null,
               expiry: document.getElementById("editExpiry").value || null,
+              warn_days:
+                parseInt(document.getElementById("editWarnDays").value) || null,
               memo: document.getElementById("editMemo").value.trim() || null,
             })
             .eq("id", id);
