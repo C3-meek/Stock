@@ -896,6 +896,75 @@
       <!-- リスト管理 -->
       <section id="listPage" class="page">
         <h2 class="page-title">⚙️ リスト管理</h2>
+
+        <!-- 注意日数設定 -->
+        <div class="card" style="margin-bottom: 16px">
+          <div
+            style="
+              display: flex;
+              align-items: center;
+              gap: 14px;
+              flex-wrap: wrap;
+            "
+          >
+            <div style="font-size: 14px; font-weight: 600; color: var(--text2)">
+              📅 「注意」表示の期限しきい値
+            </div>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap">
+              <button
+                class="warn-days-btn btn btn-sm btn-ghost"
+                data-days="30"
+                onclick="setWarnDays(30)"
+              >
+                30日前
+              </button>
+              <button
+                class="warn-days-btn btn btn-sm btn-ghost"
+                data-days="60"
+                onclick="setWarnDays(60)"
+              >
+                60日前
+              </button>
+              <button
+                class="warn-days-btn btn btn-sm btn-ghost"
+                data-days="90"
+                onclick="setWarnDays(90)"
+              >
+                90日前
+              </button>
+              <button
+                class="warn-days-btn btn btn-sm btn-ghost"
+                data-days="180"
+                onclick="setWarnDays(180)"
+              >
+                180日前
+              </button>
+            </div>
+            <div style="display: flex; align-items: center; gap: 6px">
+              <span style="font-size: 13px; color: var(--text2)"
+                >カスタム：</span
+              >
+              <input
+                type="number"
+                id="warnDaysInput"
+                min="1"
+                max="999"
+                style="width: 72px; padding: 6px 10px; font-size: 13px"
+                placeholder="日数"
+              />
+              <button
+                class="btn btn-sm btn-secondary"
+                onclick="setWarnDaysCustom()"
+              >
+                設定
+              </button>
+            </div>
+            <div
+              id="warnDaysStatus"
+              style="font-size: 13px; color: var(--red); font-weight: 600"
+            ></div>
+          </div>
+        </div>
         <div class="card">
           <div class="list-columns">
             <div class="list-box">
@@ -966,7 +1035,7 @@
             onclick="setStatFilter('soon')"
           >
             <div class="stat-val" id="statSoon" style="color: #b36f00">—</div>
-            <div class="stat-lbl">📅 30日以内</div>
+            <div class="stat-lbl" id="statSoonLbl">⚠️ 注意</div>
           </div>
           <div
             class="stat-card"
@@ -1209,6 +1278,9 @@
       const SUPABASE_ANON_KEY =
         "sb_publishable_WZRG9miBs0E8zC7Y8gYiGw_7IJjMcmc";
       const BUCKET_NAME = "item-images";
+
+      // 注意日数：localStorage に保存・変更可（初期値 30日）
+      let WARN_DAYS = parseInt(localStorage.getItem("warnDays") || "30", 10);
 
       let db;
       try {
@@ -1481,8 +1553,8 @@
       function updateStats(items) {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
-        const d30 = new Date(today);
-        d30.setDate(d30.getDate() + 30);
+        const dWarn = new Date(today);
+        dWarn.setDate(dWarn.getDate() + WARN_DAYS);
         let expired = 0,
           soon = 0,
           totalQty = 0,
@@ -1497,7 +1569,7 @@
           if (item.expiry) {
             const exp = new Date(item.expiry);
             if (exp < today) expired++;
-            else if (exp <= d30) soon++;
+            else if (exp <= dWarn) soon++;
           }
         });
         const ac = items.filter(
@@ -1506,6 +1578,8 @@
         document.getElementById("statTotal").textContent = ac;
         document.getElementById("statExpired").textContent = expired;
         document.getElementById("statSoon").textContent = soon;
+        document.getElementById("statSoonLbl").textContent =
+          `⚠️ 注意（${WARN_DAYS}日以内）`;
         document.getElementById("statQty").textContent = totalQty;
         document.getElementById("statConsumed").textContent = consumed;
       }
@@ -1518,7 +1592,7 @@
         });
         const labels = {
           expired: "⚠️ 期限切れ でフィルター中",
-          soon: "📅 30日以内に期限 でフィルター中",
+          soon: "⚠️ 注意 でフィルター中",
           consumed: "✅ 消費済み でフィルター中",
         };
         const tagEl = document.getElementById("activeFilterTag");
@@ -1545,8 +1619,8 @@
         const showConsumed = document.getElementById("showConsumed").checked;
         const today = new Date();
         today.setHours(0, 0, 0, 0);
-        const d30 = new Date(today);
-        d30.setDate(d30.getDate() + 30);
+        const dWarn = new Date(today);
+        dWarn.setDate(dWarn.getDate() + WARN_DAYS);
 
         let filtered = allItems.filter((item) => {
           if (item.status === "deleted") return false;
@@ -1557,7 +1631,7 @@
             if (item.status === "consumed") return false;
             if (!item.expiry) return false;
             const exp = new Date(item.expiry);
-            if (exp < today || exp > d30) return false;
+            if (exp < today || exp > dWarn) return false;
           } else if (activeStatFilter === "consumed") {
             if (item.status !== "consumed") return false;
           } else {
@@ -1593,11 +1667,11 @@
           if (eb) return 1;
           return (a.name || "").localeCompare(b.name || "", "ja");
         });
-        displayItems(filtered, today, d30);
-        displayCards(filtered, today, d30);
+        displayItems(filtered, today, dWarn);
+        displayCards(filtered, today, dWarn);
       }
 
-      function buildExpiry(item, today, d30, isConsumed) {
+      function buildExpiry(item, today, dWarn, isConsumed) {
         let expClass = "",
           expText = escapeHtml(item.expiry || "");
         if (!isConsumed && item.expiry) {
@@ -1605,9 +1679,9 @@
           if (exp < today) {
             expClass = "expiry-warn";
             expText += " ⚠️";
-          } else if (exp <= d30) {
+          } else if (exp <= dWarn) {
             expClass = "expiry-soon";
-            expText += " 📅";
+            expText += " ⚠️";
           }
         }
         return { expClass, expText };
@@ -1810,8 +1884,46 @@
           .replace(/"/g, "&quot;");
       }
 
+      // ── 注意日数 設定 ────────────────────────────
+      function setWarnDays(days) {
+        WARN_DAYS = days;
+        localStorage.setItem("warnDays", days);
+        applyWarnDaysUI();
+        if (allItems.length) {
+          updateStats(allItems);
+          filterItems();
+        }
+      }
+      function setWarnDaysCustom() {
+        const v = parseInt(document.getElementById("warnDaysInput").value, 10);
+        if (!v || v < 1) {
+          toast("1以上の日数を入力してください", "error");
+          return;
+        }
+        setWarnDays(v);
+        document.getElementById("warnDaysInput").value = "";
+      }
+      function applyWarnDaysUI() {
+        document.querySelectorAll(".warn-days-btn").forEach((btn) => {
+          btn.classList.toggle(
+            "btn-primary",
+            parseInt(btn.dataset.days) === WARN_DAYS,
+          );
+          btn.classList.toggle(
+            "btn-ghost",
+            parseInt(btn.dataset.days) !== WARN_DAYS,
+          );
+        });
+        document.getElementById("warnDaysStatus").textContent =
+          `現在: ${WARN_DAYS}日前`;
+        // 統計ラベルも更新
+        const lbl = document.getElementById("statSoonLbl");
+        if (lbl) lbl.textContent = `⚠️ 注意（${WARN_DAYS}日以内）`;
+      }
+
       document.addEventListener("DOMContentLoaded", () => {
         if (db) loadSelectLists();
+        applyWarnDaysUI();
         document
           .querySelectorAll('input[type="text"],input[type="number"]')
           .forEach((el) => {
