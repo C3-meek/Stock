@@ -5,7 +5,7 @@
     <base target="_top" />
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>備蓄管理アプリ</title>
+    <title>備蓄管理</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -345,37 +345,46 @@
       .tag {
         display: inline-flex;
         align-items: center;
-        gap: 4px;
-        padding: 5px 11px;
+        gap: 0;
+        padding: 0;
         background: white;
         border: 1px solid var(--border);
         border-radius: 20px;
         font-size: 13px;
+        overflow: hidden;
+      }
+      .tag .tag-name {
+        padding: 5px 8px 5px 12px;
       }
       .tag .rename-btn {
         background: none;
         border: none;
+        border-left: 1px solid var(--border);
         cursor: pointer;
         color: var(--blue);
-        font-size: 13px;
+        font-size: 12px;
         line-height: 1;
-        padding: 0 1px;
-        opacity: 0.7;
-        transition: opacity 0.15s;
+        padding: 5px 8px;
+        opacity: 0.75;
+        transition: background 0.15s, opacity 0.15s;
       }
       .tag .rename-btn:hover {
+        background: var(--blue-light);
         opacity: 1;
       }
       .tag .del-btn {
         background: none;
         border: none;
+        border-left: 1px solid var(--border);
         cursor: pointer;
         color: var(--text2);
-        font-size: 14px;
+        font-size: 13px;
         line-height: 1;
-        padding: 0 0 0 1px;
+        padding: 5px 9px;
+        transition: background 0.15s, color 0.15s;
       }
       .tag .del-btn:hover {
+        background: var(--red-light);
         color: var(--red);
       }
       .stats-bar {
@@ -1197,9 +1206,9 @@
         // ✏️ 名称変更ボタンを各タグに追加
         el.innerHTML = items.map(item =>
           `<span class="tag">
-            ${escapeHtml(item.name)}
+            <span class="tag-name">${escapeHtml(item.name)}</span>
             <button class="rename-btn" title="名称を変更" onclick="openRenameModal('${type}',${item.id},'${escapeHtml(item.name)}')">✏️</button>
-            <button class="del-btn" onclick="deleteListItem('${type}',${item.id},'${escapeHtml(item.name)}')">×</button>
+            <button class="del-btn" onclick="deleteListItem('${type}',${item.id},'${escapeHtml(item.name)}')" title="削除">×</button>
           </span>`
         ).join("");
       }
