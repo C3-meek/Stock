@@ -1,11 +1,11 @@
 <!doctype html>
-<!-- 構造：<!DOCTYPE html>〜</html> まで / 備蓄管理アプリ v4 -->
+<!-- 構造：<!DOCTYPE html>〜</html> まで / 備蓄管理アプリ v5（名称変更機能追加） -->
 <html lang="ja">
   <head>
     <base target="_top" />
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>備蓄管理アプリ</title>
+    <title>備蓄管理</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -341,15 +341,30 @@
         flex-wrap: wrap;
         gap: 8px;
       }
+      /* タグ：名称変更ボタン追加 */
       .tag {
         display: inline-flex;
         align-items: center;
-        gap: 5px;
+        gap: 4px;
         padding: 5px 11px;
         background: white;
         border: 1px solid var(--border);
         border-radius: 20px;
         font-size: 13px;
+      }
+      .tag .rename-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: var(--blue);
+        font-size: 13px;
+        line-height: 1;
+        padding: 0 1px;
+        opacity: 0.7;
+        transition: opacity 0.15s;
+      }
+      .tag .rename-btn:hover {
+        opacity: 1;
       }
       .tag .del-btn {
         background: none;
@@ -358,7 +373,7 @@
         color: var(--text2);
         font-size: 14px;
         line-height: 1;
-        padding: 0 0 0 2px;
+        padding: 0 0 0 1px;
       }
       .tag .del-btn:hover {
         color: var(--red);
@@ -462,47 +477,16 @@
       tbody tr:hover {
         background: var(--red-light);
       }
-      th:nth-child(1),
-      td:nth-child(1) {
-        width: 62px;
-      }
-      th:nth-child(2),
-      td:nth-child(2) {
-        width: 15%;
-      }
-      th:nth-child(3),
-      td:nth-child(3) {
-        width: 10%;
-      }
-      th:nth-child(4),
-      td:nth-child(4) {
-        width: 5%;
-        text-align: center;
-      }
-      th:nth-child(5),
-      td:nth-child(5) {
-        width: 10%;
-      }
-      th:nth-child(6),
-      td:nth-child(6) {
-        width: 9%;
-      }
-      th:nth-child(7),
-      td:nth-child(7) {
-        width: 9%;
-      }
-      th:nth-child(8),
-      td:nth-child(8) {
-        width: 9%;
-      }
-      th:nth-child(9),
-      td:nth-child(9) {
-        width: auto;
-      }
-      th:nth-child(10),
-      td:nth-child(10) {
-        width: 155px;
-      }
+      th:nth-child(1), td:nth-child(1) { width: 62px; }
+      th:nth-child(2), td:nth-child(2) { width: 15%; }
+      th:nth-child(3), td:nth-child(3) { width: 10%; }
+      th:nth-child(4), td:nth-child(4) { width: 5%; text-align: center; }
+      th:nth-child(5), td:nth-child(5) { width: 10%; }
+      th:nth-child(6), td:nth-child(6) { width: 9%; }
+      th:nth-child(7), td:nth-child(7) { width: 9%; }
+      th:nth-child(8), td:nth-child(8) { width: 9%; }
+      th:nth-child(9), td:nth-child(9) { width: auto; }
+      th:nth-child(10), td:nth-child(10) { width: 155px; }
       .thumb {
         width: 48px;
         height: 48px;
@@ -529,14 +513,8 @@
         font-size: 11px;
         font-weight: 500;
       }
-      .badge-cat {
-        background: #fef2f1;
-        color: var(--red);
-      }
-      .badge-place {
-        background: #e8f5e9;
-        color: #2d7d46;
-      }
+      .badge-cat { background: #fef2f1; color: var(--red); }
+      .badge-place { background: #e8f5e9; color: #2d7d46; }
       .badge-consumed {
         background: #f5f5f5;
         color: #999;
@@ -544,14 +522,8 @@
         padding: 2px 6px;
         border-radius: 10px;
       }
-      .expiry-warn {
-        color: var(--red);
-        font-weight: 600;
-      }
-      .expiry-soon {
-        color: #b36f00;
-        font-weight: 600;
-      }
+      .expiry-warn { color: var(--red); font-weight: 600; }
+      .expiry-soon { color: #b36f00; font-weight: 600; }
       .action-btns {
         display: flex;
         gap: 4px;
@@ -577,9 +549,7 @@
         overflow: hidden;
         box-shadow: var(--shadow);
       }
-      .item-card.consumed-card {
-        opacity: 0.65;
-      }
+      .item-card.consumed-card { opacity: 0.65; }
       .item-card-head {
         display: flex;
         align-items: center;
@@ -607,10 +577,7 @@
         font-size: 1.5rem;
         flex-shrink: 0;
       }
-      .card-title-wrap {
-        flex: 1;
-        min-width: 0;
-      }
+      .card-title-wrap { flex: 1; min-width: 0; }
       .card-title-wrap h3 {
         font-size: 15px;
         font-weight: 600;
@@ -619,11 +586,7 @@
         text-overflow: ellipsis;
         white-space: nowrap;
       }
-      .card-badges {
-        display: flex;
-        gap: 5px;
-        flex-wrap: wrap;
-      }
+      .card-badges { display: flex; gap: 5px; flex-wrap: wrap; }
       .item-card-body {
         padding: 10px 14px;
         display: grid;
@@ -631,15 +594,8 @@
         gap: 5px 12px;
         font-size: 12px;
       }
-      .card-field label {
-        color: var(--text2);
-        display: block;
-        font-size: 11px;
-      }
-      .card-field span {
-        font-weight: 500;
-        font-size: 13px;
-      }
+      .card-field label { color: var(--text2); display: block; font-size: 11px; }
+      .card-field span { font-weight: 500; font-size: 13px; }
       .item-card-foot {
         padding: 10px 14px;
         border-top: 1px solid var(--border);
@@ -647,16 +603,12 @@
         gap: 6px;
         flex-wrap: wrap;
       }
-      /* ローディング */
       .empty {
         padding: 40px 20px;
         text-align: center;
         color: var(--text2);
       }
-      .empty-icon {
-        font-size: 2.5rem;
-        margin-bottom: 10px;
-      }
+      .empty-icon { font-size: 2.5rem; margin-bottom: 10px; }
       .spinner {
         width: 18px;
         height: 18px;
@@ -675,12 +627,7 @@
         animation: spin 0.8s linear infinite;
         display: inline-block;
       }
-      @keyframes spin {
-        to {
-          transform: rotate(360deg);
-        }
-      }
-      /* Toast */
+      @keyframes spin { to { transform: rotate(360deg); } }
       #toast {
         position: fixed;
         bottom: 22px;
@@ -697,17 +644,9 @@
         z-index: 9999;
         white-space: nowrap;
       }
-      #toast.show {
-        opacity: 1;
-        transform: translateX(-50%) translateY(0);
-      }
-      #toast.success {
-        background: var(--green);
-      }
-      #toast.error {
-        background: var(--red);
-      }
-      /* モーダル */
+      #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+      #toast.success { background: var(--green); }
+      #toast.error { background: var(--red); }
       .modal-overlay {
         position: fixed;
         inset: 0;
@@ -720,10 +659,7 @@
         pointer-events: none;
         transition: opacity 0.2s;
       }
-      .modal-overlay.open {
-        opacity: 1;
-        pointer-events: auto;
-      }
+      .modal-overlay.open { opacity: 1; pointer-events: auto; }
       .modal-box {
         background: white;
         border-radius: 14px;
@@ -751,44 +687,41 @@
         color: var(--text2);
         line-height: 1;
       }
-      .modal-close:hover {
-        color: var(--red);
-      }
+      .modal-close:hover { color: var(--red); }
       .modal-foot {
         display: flex;
         gap: 10px;
         margin-top: 18px;
         justify-content: flex-end;
       }
-      /* レスポンシブ */
+      /* 名称変更モーダル専用 */
+      .rename-modal-box {
+        background: white;
+        border-radius: 14px;
+        padding: 24px;
+        width: min(95vw, 400px);
+        position: relative;
+      }
+      .rename-note {
+        font-size: 12px;
+        color: var(--text2);
+        margin-top: 6px;
+        padding: 8px 12px;
+        background: #fffbea;
+        border-radius: 8px;
+        border: 1px solid #ffe082;
+      }
       @media (max-width: 700px) {
-        .nav-btn {
-          padding: 6px 10px;
-          font-size: 12px;
-        }
-        .app-body {
-          padding: 14px 10px;
-        }
-        .form-row {
-          grid-template-columns: 1fr;
-        }
-        .list-columns {
-          grid-template-columns: 1fr;
-        }
-        .tbl-wrap {
-          display: none;
-        }
-        .card-list {
-          display: flex;
-        }
-        .stats-bar {
-          grid-template-columns: repeat(3, 1fr);
-        }
+        .nav-btn { padding: 6px 10px; font-size: 12px; }
+        .app-body { padding: 14px 10px; }
+        .form-row { grid-template-columns: 1fr; }
+        .list-columns { grid-template-columns: 1fr; }
+        .tbl-wrap { display: none; }
+        .card-list { display: flex; }
+        .stats-bar { grid-template-columns: repeat(3, 1fr); }
       }
       @media (max-width: 400px) {
-        .stats-bar {
-          grid-template-columns: repeat(2, 1fr);
-        }
+        .stats-bar { grid-template-columns: repeat(2, 1fr); }
       }
     </style>
   </head>
@@ -796,15 +729,9 @@
     <header class="app-header">
       <div class="app-logo"><span>🏠</span> 備蓄管理アプリ</div>
       <nav>
-        <button class="nav-btn active" onclick="showPage('registerPage', this)">
-          📝 登録
-        </button>
-        <button class="nav-btn" onclick="showPage('listPage', this)">
-          ⚙️ リスト
-        </button>
-        <button class="nav-btn" onclick="showPage('viewPage', this)">
-          📊 一覧
-        </button>
+        <button class="nav-btn active" onclick="showPage('registerPage', this)">📝 登録</button>
+        <button class="nav-btn" onclick="showPage('listPage', this)">⚙️ リスト</button>
+        <button class="nav-btn" onclick="showPage('viewPage', this)">📊 一覧</button>
       </nav>
     </header>
 
@@ -821,131 +748,65 @@
           <div class="form-grid">
             <div class="form-group">
               <label>画像</label>
-              <div
-                class="img-upload-area"
-                id="uploadArea"
-                onclick="document.getElementById('imgFile').click()"
-              >
+              <div class="img-upload-area" id="uploadArea" onclick="document.getElementById('imgFile').click()">
                 <div class="upload-icon">📷</div>
                 <p>クリックまたはドラッグ＆ドロップ（JPG/PNG/WEBP・最大5MB）</p>
-                <input
-                  type="file"
-                  id="imgFile"
-                  accept="image/*"
-                  onchange="handleImageSelect(event, 'imagePreview')"
-                />
+                <input type="file" id="imgFile" accept="image/*" onchange="handleImageSelect(event, 'imagePreview')" />
               </div>
               <img id="imagePreview" class="img-preview" alt="プレビュー" />
             </div>
             <div class="form-group req">
-              <label for="name">品名</label
-              ><input type="text" id="name" placeholder="例：非常用水 2L" />
+              <label for="name">品名</label>
+              <input type="text" id="name" placeholder="例：非常用水 2L" />
             </div>
             <div class="form-row">
               <div class="form-group req">
-                <label for="category">カテゴリー</label
-                ><select id="category">
-                  <option value="">選択してください</option>
-                </select>
+                <label for="category">カテゴリー</label>
+                <select id="category"><option value="">選択してください</option></select>
               </div>
               <div class="form-group req">
-                <label for="qty">数量</label
-                ><input type="number" id="qty" min="1" value="1" />
+                <label for="qty">数量</label>
+                <input type="number" id="qty" min="1" value="1" />
               </div>
             </div>
             <div class="form-row">
               <div class="form-group req">
-                <label for="place">保管場所</label
-                ><select id="place">
-                  <option value="">選択してください</option>
-                </select>
+                <label for="place">保管場所</label>
+                <select id="place"><option value="">選択してください</option></select>
               </div>
               <div class="form-group">
-                <label for="supplier">購入先</label
-                ><input type="text" id="supplier" placeholder="例：○○ストア" />
+                <label for="supplier">購入先</label>
+                <input type="text" id="supplier" placeholder="例：○○ストア" />
               </div>
             </div>
             <div class="form-row">
               <div class="form-group">
-                <label for="purchaseDate">購入日</label
-                ><input type="date" id="purchaseDate" />
+                <label for="purchaseDate">購入日</label>
+                <input type="date" id="purchaseDate" />
               </div>
               <div class="form-group">
-                <label for="expiry">使用期限</label
-                ><input type="date" id="expiry" />
+                <label for="expiry">使用期限</label>
+                <input type="date" id="expiry" />
               </div>
             </div>
             <div class="form-group">
-              <label for="warnDaysItem"
-                >注意日数（空欄 = デフォルト設定を使用）</label
-              >
-              <div
-                style="
-                  display: flex;
-                  gap: 8px;
-                  align-items: center;
-                  flex-wrap: wrap;
-                "
-              >
-                <input
-                  type="number"
-                  id="warnDaysItem"
-                  min="1"
-                  max="999"
-                  placeholder="例：60"
-                  style="max-width: 120px"
-                />
-                <span style="font-size: 12px; color: var(--text2)"
-                  >日前から「注意」表示</span
-                >
-                <div style="display: flex; gap: 6px">
-                  <button
-                    type="button"
-                    class="btn btn-ghost btn-sm"
-                    onclick="document.getElementById('warnDaysItem').value = 30"
-                  >
-                    30
-                  </button>
-                  <button
-                    type="button"
-                    class="btn btn-ghost btn-sm"
-                    onclick="document.getElementById('warnDaysItem').value = 60"
-                  >
-                    60
-                  </button>
-                  <button
-                    type="button"
-                    class="btn btn-ghost btn-sm"
-                    onclick="document.getElementById('warnDaysItem').value = 90"
-                  >
-                    90
-                  </button>
-                  <button
-                    type="button"
-                    class="btn btn-ghost btn-sm"
-                    onclick="
-                      document.getElementById('warnDaysItem').value = 180
-                    "
-                  >
-                    180
-                  </button>
+              <label for="warnDaysItem">注意日数（空欄 = デフォルト設定を使用）</label>
+              <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                <input type="number" id="warnDaysItem" min="1" max="999" placeholder="例：60" style="max-width:120px" />
+                <span style="font-size:12px;color:var(--text2)">日前から「注意」表示</span>
+                <div style="display:flex;gap:6px">
+                  <button type="button" class="btn btn-ghost btn-sm" onclick="document.getElementById('warnDaysItem').value=30">30</button>
+                  <button type="button" class="btn btn-ghost btn-sm" onclick="document.getElementById('warnDaysItem').value=60">60</button>
+                  <button type="button" class="btn btn-ghost btn-sm" onclick="document.getElementById('warnDaysItem').value=90">90</button>
+                  <button type="button" class="btn btn-ghost btn-sm" onclick="document.getElementById('warnDaysItem').value=180">180</button>
                 </div>
               </div>
             </div>
             <div class="form-group">
-              <label for="memo">メモ</label
-              ><textarea
-                id="memo"
-                placeholder="その他の情報があれば記入"
-              ></textarea>
+              <label for="memo">メモ</label>
+              <textarea id="memo" placeholder="その他の情報があれば記入"></textarea>
             </div>
-            <button
-              class="btn btn-primary btn-full"
-              id="submitBtn"
-              onclick="saveItem()"
-            >
-              登録する
-            </button>
+            <button class="btn btn-primary btn-full" id="submitBtn" onclick="saveItem()">登録する</button>
           </div>
         </div>
       </section>
@@ -953,76 +814,24 @@
       <!-- リスト管理 -->
       <section id="listPage" class="page">
         <h2 class="page-title">⚙️ リスト管理</h2>
-
-        <!-- 注意日数設定 -->
-        <div class="card" style="margin-bottom: 16px">
-          <div
-            style="
-              display: flex;
-              align-items: center;
-              gap: 14px;
-              flex-wrap: wrap;
-            "
-          >
-            <div style="font-size: 14px; font-weight: 600; color: var(--text2)">
-              📅 「注意」表示のデフォルト日数<br /><span
-                style="font-size: 11px; font-weight: 400"
-                >※アイテムごとに注意日数を設定していない場合に使われます</span
-              >
+        <div class="card" style="margin-bottom:16px">
+          <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+            <div style="font-size:14px;font-weight:600;color:var(--text2)">
+              📅 「注意」表示のデフォルト日数<br />
+              <span style="font-size:11px;font-weight:400">※アイテムごとに注意日数を設定していない場合に使われます</span>
             </div>
-            <div style="display: flex; gap: 8px; flex-wrap: wrap">
-              <button
-                class="warn-days-btn btn btn-sm btn-ghost"
-                data-days="30"
-                onclick="setWarnDays(30)"
-              >
-                30日前
-              </button>
-              <button
-                class="warn-days-btn btn btn-sm btn-ghost"
-                data-days="60"
-                onclick="setWarnDays(60)"
-              >
-                60日前
-              </button>
-              <button
-                class="warn-days-btn btn btn-sm btn-ghost"
-                data-days="90"
-                onclick="setWarnDays(90)"
-              >
-                90日前
-              </button>
-              <button
-                class="warn-days-btn btn btn-sm btn-ghost"
-                data-days="180"
-                onclick="setWarnDays(180)"
-              >
-                180日前
-              </button>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <button class="warn-days-btn btn btn-sm btn-ghost" data-days="30" onclick="setWarnDays(30)">30日前</button>
+              <button class="warn-days-btn btn btn-sm btn-ghost" data-days="60" onclick="setWarnDays(60)">60日前</button>
+              <button class="warn-days-btn btn btn-sm btn-ghost" data-days="90" onclick="setWarnDays(90)">90日前</button>
+              <button class="warn-days-btn btn btn-sm btn-ghost" data-days="180" onclick="setWarnDays(180)">180日前</button>
             </div>
-            <div style="display: flex; align-items: center; gap: 6px">
-              <span style="font-size: 13px; color: var(--text2)"
-                >カスタム：</span
-              >
-              <input
-                type="number"
-                id="warnDaysInput"
-                min="1"
-                max="999"
-                style="width: 72px; padding: 6px 10px; font-size: 13px"
-                placeholder="日数"
-              />
-              <button
-                class="btn btn-sm btn-secondary"
-                onclick="setWarnDaysCustom()"
-              >
-                設定
-              </button>
+            <div style="display:flex;align-items:center;gap:6px">
+              <span style="font-size:13px;color:var(--text2)">カスタム：</span>
+              <input type="number" id="warnDaysInput" min="1" max="999" style="width:72px;padding:6px 10px;font-size:13px" placeholder="日数" />
+              <button class="btn btn-sm btn-secondary" onclick="setWarnDaysCustom()">設定</button>
             </div>
-            <div
-              id="warnDaysStatus"
-              style="font-size: 13px; color: var(--red); font-weight: 600"
-            ></div>
+            <div id="warnDaysStatus" style="font-size:13px;color:var(--red);font-weight:600"></div>
           </div>
         </div>
         <div class="card">
@@ -1030,38 +839,18 @@
             <div class="list-box">
               <h3>📁 カテゴリー</h3>
               <div class="input-row">
-                <input
-                  type="text"
-                  id="categoryInput"
-                  placeholder="新しいカテゴリー名"
-                /><button
-                  class="btn btn-secondary btn-sm"
-                  onclick="addListItem('category')"
-                >
-                  追加
-                </button>
+                <input type="text" id="categoryInput" placeholder="新しいカテゴリー名" />
+                <button class="btn btn-secondary btn-sm" onclick="addListItem('category')">追加</button>
               </div>
-              <div class="tag-list" id="categoryTags">
-                <span class="spinner-dark"></span>
-              </div>
+              <div class="tag-list" id="categoryTags"><span class="spinner-dark"></span></div>
             </div>
             <div class="list-box">
               <h3>📍 保管場所</h3>
               <div class="input-row">
-                <input
-                  type="text"
-                  id="placeInput"
-                  placeholder="新しい保管場所名"
-                /><button
-                  class="btn btn-secondary btn-sm"
-                  onclick="addListItem('place')"
-                >
-                  追加
-                </button>
+                <input type="text" id="placeInput" placeholder="新しい保管場所名" />
+                <button class="btn btn-secondary btn-sm" onclick="addListItem('place')">追加</button>
               </div>
-              <div class="tag-list" id="placeTags">
-                <span class="spinner-dark"></span>
-              </div>
+              <div class="tag-list" id="placeTags"><span class="spinner-dark"></span></div>
             </div>
           </div>
         </div>
@@ -1071,139 +860,70 @@
       <section id="viewPage" class="page">
         <h2 class="page-title">📊 一覧表示</h2>
         <div class="stats-bar">
-          <div
-            class="stat-card"
-            id="statCardAll"
-            onclick="setStatFilter('all')"
-          >
+          <div class="stat-card" id="statCardAll" onclick="setStatFilter('all')">
             <div class="stat-val" id="statTotal">—</div>
             <div class="stat-lbl">登録品目数</div>
           </div>
-          <div
-            class="stat-card"
-            id="statCardExpired"
-            onclick="setStatFilter('expired')"
-          >
-            <div class="stat-val" id="statExpired" style="color: var(--red)">
-              —
-            </div>
+          <div class="stat-card" id="statCardExpired" onclick="setStatFilter('expired')">
+            <div class="stat-val" id="statExpired" style="color:var(--red)">—</div>
             <div class="stat-lbl">⚠️ 期限切れ</div>
           </div>
-          <div
-            class="stat-card"
-            id="statCardSoon"
-            onclick="setStatFilter('soon')"
-          >
-            <div class="stat-val" id="statSoon" style="color: #b36f00">—</div>
+          <div class="stat-card" id="statCardSoon" onclick="setStatFilter('soon')">
+            <div class="stat-val" id="statSoon" style="color:#b36f00">—</div>
             <div class="stat-lbl" id="statSoonLbl">⚠️ 注意</div>
           </div>
-          <div
-            class="stat-card"
-            id="statCardQty"
-            onclick="setStatFilter('all')"
-          >
+          <div class="stat-card" id="statCardQty" onclick="setStatFilter('all')">
             <div class="stat-val" id="statQty">—</div>
             <div class="stat-lbl">総数量</div>
           </div>
-          <div
-            class="stat-card"
-            id="statCardConsumed"
-            onclick="setStatFilter('consumed')"
-          >
-            <div class="stat-val" id="statConsumed" style="color: #2d7d46">
-              —
-            </div>
+          <div class="stat-card" id="statCardConsumed" onclick="setStatFilter('consumed')">
+            <div class="stat-val" id="statConsumed" style="color:#2d7d46">—</div>
             <div class="stat-lbl">✅ 消費済み</div>
           </div>
         </div>
-        <div id="activeFilterTag" style="display: none">
-          <span class="filter-tag"
-            ><span id="filterTagLabel"></span
-            ><button onclick="setStatFilter('all')" title="解除">
-              ✕
-            </button></span
-          >
+        <div id="activeFilterTag" style="display:none">
+          <span class="filter-tag">
+            <span id="filterTagLabel"></span>
+            <button onclick="setStatFilter('all')" title="解除">✕</button>
+          </span>
         </div>
         <div class="view-controls">
-          <div class="form-group" style="flex: 2; min-width: 160px">
-            <label for="searchInput">🔍 検索</label
-            ><input
-              type="text"
-              id="searchInput"
-              placeholder="品名・メモなど"
-              oninput="filterItems()"
-            />
+          <div class="form-group" style="flex:2;min-width:160px">
+            <label for="searchInput">🔍 検索</label>
+            <input type="text" id="searchInput" placeholder="品名・メモなど" oninput="filterItems()" />
           </div>
           <div class="form-group">
-            <label for="filterCat">カテゴリー</label
-            ><select id="filterCat" onchange="filterItems()">
-              <option value="">すべて</option>
-            </select>
+            <label for="filterCat">カテゴリー</label>
+            <select id="filterCat" onchange="filterItems()"><option value="">すべて</option></select>
           </div>
           <div class="form-group">
-            <label for="filterPlace">保管場所</label
-            ><select id="filterPlace" onchange="filterItems()">
-              <option value="">すべて</option>
-            </select>
+            <label for="filterPlace">保管場所</label>
+            <select id="filterPlace" onchange="filterItems()"><option value="">すべて</option></select>
           </div>
-          <button
-            class="btn btn-ghost btn-sm"
-            onclick="loadItems()"
-            style="align-self: flex-end"
-          >
-            🔄 更新
-          </button>
+          <button class="btn btn-ghost btn-sm" onclick="loadItems()" style="align-self:flex-end">🔄 更新</button>
         </div>
-        <div style="margin-bottom: 12px">
-          <label
-            style="
-              display: inline-flex;
-              align-items: center;
-              gap: 8px;
-              font-size: 13px;
-              cursor: pointer;
-            "
-          >
-            <input
-              type="checkbox"
-              id="showConsumed"
-              onchange="filterItems()"
-              style="width: 16px; height: 16px"
-            />
+        <div style="margin-bottom:12px">
+          <label style="display:inline-flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;">
+            <input type="checkbox" id="showConsumed" onchange="filterItems()" style="width:16px;height:16px" />
             消費済みも表示する
           </label>
         </div>
-        <!-- PC テーブル -->
         <div class="tbl-wrap">
           <table>
             <thead>
               <tr>
-                <th>画像</th>
-                <th>品名</th>
-                <th>カテゴリー</th>
-                <th>数量</th>
-                <th>保管場所</th>
-                <th>購入先</th>
-                <th>購入日</th>
-                <th>使用期限</th>
-                <th>メモ</th>
-                <th>操作</th>
+                <th>画像</th><th>品名</th><th>カテゴリー</th><th>数量</th>
+                <th>保管場所</th><th>購入先</th><th>購入日</th><th>使用期限</th>
+                <th>メモ</th><th>操作</th>
               </tr>
             </thead>
             <tbody id="itemsBody">
-              <tr>
-                <td colspan="10" class="empty">
-                  <span class="spinner-dark"></span> 読み込み中…
-                </td>
-              </tr>
+              <tr><td colspan="10" class="empty"><span class="spinner-dark"></span> 読み込み中…</td></tr>
             </tbody>
           </table>
         </div>
-        <!-- スマホ カード -->
         <div class="card-list" id="cardList">
-          <div class="empty">
-            <span class="spinner-dark"></span> 読み込み中…
-          </div>
+          <div class="empty"><span class="spinner-dark"></span> 読み込み中…</div>
         </div>
       </section>
     </div>
@@ -1211,178 +931,105 @@
     <div id="toast"></div>
 
     <!-- 画像拡大モーダル -->
-    <div
-      class="modal-overlay"
-      id="imgModal"
-      onclick="if (event.target === this) closeModal('imgModal');"
-    >
-      <div
-        class="modal-box"
-        style="
-          padding: 16px;
-          width: auto;
-          background: transparent;
-          box-shadow: none;
-        "
-      >
-        <button
-          class="modal-close"
-          style="color: white; top: 4px; right: 8px"
-          onclick="closeModal('imgModal')"
-        >
-          ✕
-        </button>
-        <img
-          id="modalImg"
-          src=""
-          alt=""
-          style="
-            max-width: 88vw;
-            max-height: 80vh;
-            border-radius: 10px;
-            display: block;
-          "
-        />
+    <div class="modal-overlay" id="imgModal" onclick="if(event.target===this)closeModal('imgModal');">
+      <div class="modal-box" style="padding:16px;width:auto;background:transparent;box-shadow:none;">
+        <button class="modal-close" style="color:white;top:4px;right:8px" onclick="closeModal('imgModal')">✕</button>
+        <img id="modalImg" src="" alt="" style="max-width:88vw;max-height:80vh;border-radius:10px;display:block;" />
       </div>
     </div>
 
     <!-- 編集モーダル -->
-    <div
-      class="modal-overlay"
-      id="editModal"
-      onclick="if (event.target === this) closeModal('editModal');"
-    >
+    <div class="modal-overlay" id="editModal" onclick="if(event.target===this)closeModal('editModal');">
       <div class="modal-box">
         <button class="modal-close" onclick="closeModal('editModal')">✕</button>
         <div class="modal-title">✏️ 品目を編集</div>
         <input type="hidden" id="editId" />
-        <div class="form-grid" style="max-width: 100%">
+        <div class="form-grid" style="max-width:100%">
           <div class="form-group">
             <label>画像（変更する場合のみ選択）</label>
-            <div
-              class="img-upload-area"
-              onclick="document.getElementById('editImgFile').click()"
-            >
+            <div class="img-upload-area" onclick="document.getElementById('editImgFile').click()">
               <div class="upload-icon">📷</div>
               <p>クリックして画像を変更</p>
-              <input
-                type="file"
-                id="editImgFile"
-                accept="image/*"
-                onchange="handleImageSelect(event, 'editImagePreview')"
-              />
+              <input type="file" id="editImgFile" accept="image/*" onchange="handleImageSelect(event,'editImagePreview')" />
             </div>
             <img id="editImagePreview" class="img-preview" alt="プレビュー" />
-            <div
-              id="editCurrentImg"
-              style="margin-top: 6px; font-size: 12px; color: var(--text2)"
-            ></div>
+            <div id="editCurrentImg" style="margin-top:6px;font-size:12px;color:var(--text2)"></div>
           </div>
           <div class="form-group req">
-            <label for="editName">品名</label
-            ><input type="text" id="editName" />
+            <label for="editName">品名</label>
+            <input type="text" id="editName" />
           </div>
           <div class="form-row">
             <div class="form-group req">
-              <label for="editCategory">カテゴリー</label
-              ><select id="editCategory">
-                <option value="">選択してください</option>
-              </select>
+              <label for="editCategory">カテゴリー</label>
+              <select id="editCategory"><option value="">選択してください</option></select>
             </div>
             <div class="form-group req">
-              <label for="editQty">数量</label
-              ><input type="number" id="editQty" min="1" />
+              <label for="editQty">数量</label>
+              <input type="number" id="editQty" min="1" />
             </div>
           </div>
           <div class="form-row">
             <div class="form-group req">
-              <label for="editPlace">保管場所</label
-              ><select id="editPlace">
-                <option value="">選択してください</option>
-              </select>
+              <label for="editPlace">保管場所</label>
+              <select id="editPlace"><option value="">選択してください</option></select>
             </div>
             <div class="form-group">
-              <label for="editSupplier">購入先</label
-              ><input type="text" id="editSupplier" />
+              <label for="editSupplier">購入先</label>
+              <input type="text" id="editSupplier" />
             </div>
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label for="editPurchaseDate">購入日</label
-              ><input type="date" id="editPurchaseDate" />
+              <label for="editPurchaseDate">購入日</label>
+              <input type="date" id="editPurchaseDate" />
             </div>
             <div class="form-group">
-              <label for="editExpiry">使用期限</label
-              ><input type="date" id="editExpiry" />
+              <label for="editExpiry">使用期限</label>
+              <input type="date" id="editExpiry" />
             </div>
           </div>
           <div class="form-group">
-            <label for="editWarnDays"
-              >注意日数（空欄 = デフォルト設定を使用）</label
-            >
-            <div
-              style="
-                display: flex;
-                gap: 8px;
-                align-items: center;
-                flex-wrap: wrap;
-              "
-            >
-              <input
-                type="number"
-                id="editWarnDays"
-                min="1"
-                max="999"
-                placeholder="例：60"
-                style="max-width: 120px"
-              />
-              <span style="font-size: 12px; color: var(--text2)"
-                >日前から「注意」表示</span
-              >
-              <div style="display: flex; gap: 6px">
-                <button
-                  type="button"
-                  class="btn btn-ghost btn-sm"
-                  onclick="document.getElementById('editWarnDays').value = 30"
-                >
-                  30
-                </button>
-                <button
-                  type="button"
-                  class="btn btn-ghost btn-sm"
-                  onclick="document.getElementById('editWarnDays').value = 60"
-                >
-                  60
-                </button>
-                <button
-                  type="button"
-                  class="btn btn-ghost btn-sm"
-                  onclick="document.getElementById('editWarnDays').value = 90"
-                >
-                  90
-                </button>
-                <button
-                  type="button"
-                  class="btn btn-ghost btn-sm"
-                  onclick="document.getElementById('editWarnDays').value = 180"
-                >
-                  180
-                </button>
+            <label for="editWarnDays">注意日数（空欄 = デフォルト設定を使用）</label>
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+              <input type="number" id="editWarnDays" min="1" max="999" placeholder="例：60" style="max-width:120px" />
+              <span style="font-size:12px;color:var(--text2)">日前から「注意」表示</span>
+              <div style="display:flex;gap:6px">
+                <button type="button" class="btn btn-ghost btn-sm" onclick="document.getElementById('editWarnDays').value=30">30</button>
+                <button type="button" class="btn btn-ghost btn-sm" onclick="document.getElementById('editWarnDays').value=60">60</button>
+                <button type="button" class="btn btn-ghost btn-sm" onclick="document.getElementById('editWarnDays').value=90">90</button>
+                <button type="button" class="btn btn-ghost btn-sm" onclick="document.getElementById('editWarnDays').value=180">180</button>
               </div>
             </div>
           </div>
           <div class="form-group">
-            <label for="editMemo">メモ</label
-            ><textarea id="editMemo"></textarea>
+            <label for="editMemo">メモ</label>
+            <textarea id="editMemo"></textarea>
           </div>
         </div>
         <div class="modal-foot">
-          <button class="btn btn-ghost" onclick="closeModal('editModal')">
-            キャンセル
-          </button>
-          <button class="btn btn-primary" id="editSaveBtn" onclick="saveEdit()">
-            💾 保存する
-          </button>
+          <button class="btn btn-ghost" onclick="closeModal('editModal')">キャンセル</button>
+          <button class="btn btn-primary" id="editSaveBtn" onclick="saveEdit()">💾 保存する</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ★ 名称変更モーダル（新規追加） -->
+    <div class="modal-overlay" id="renameModal" onclick="if(event.target===this)closeModal('renameModal');">
+      <div class="rename-modal-box">
+        <button class="modal-close" onclick="closeModal('renameModal')">✕</button>
+        <div class="modal-title" id="renameModalTitle">✏️ 名称を変更</div>
+        <input type="hidden" id="renameId" />
+        <input type="hidden" id="renameType" />
+        <input type="hidden" id="renameOldName" />
+        <div class="form-group" style="margin-bottom:10px">
+          <label for="renameNewName">新しい名称</label>
+          <input type="text" id="renameNewName" placeholder="新しい名称を入力" />
+        </div>
+        <p class="rename-note" id="renameNote"></p>
+        <div class="modal-foot">
+          <button class="btn btn-ghost" onclick="closeModal('renameModal')">キャンセル</button>
+          <button class="btn btn-primary" id="renameSaveBtn" onclick="saveRename()">💾 変更する</button>
         </div>
       </div>
     </div>
@@ -1390,19 +1037,14 @@
     <script>
       // ★ 設定欄 ★
       const SUPABASE_URL = "https://qbamjdqronptilzxfekh.supabase.co";
-      const SUPABASE_ANON_KEY =
-        "sb_publishable_WZRG9miBs0E8zC7Y8gYiGw_7IJjMcmc";
+      const SUPABASE_ANON_KEY = "sb_publishable_WZRG9miBs0E8zC7Y8gYiGw_7IJjMcmc";
       const BUCKET_NAME = "item-images";
 
-      // 注意日数：localStorage に保存・変更可（初期値 30日）
       let WARN_DAYS = parseInt(localStorage.getItem("warnDays") || "30", 10);
 
       let db;
       try {
-        if (
-          SUPABASE_URL.startsWith("YOUR_") ||
-          SUPABASE_ANON_KEY.startsWith("YOUR_")
-        ) {
+        if (SUPABASE_URL.startsWith("YOUR_") || SUPABASE_ANON_KEY.startsWith("YOUR_")) {
           document.getElementById("configBanner").style.display = "block";
         } else {
           db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -1411,18 +1053,11 @@
         document.getElementById("configBanner").style.display = "block";
       }
 
-      let allItems = [],
-        selectedImageFile = null,
-        editImageFile = null,
-        activeStatFilter = "all";
+      let allItems = [], selectedImageFile = null, editImageFile = null, activeStatFilter = "all";
 
       function showPage(id, btn) {
-        document
-          .querySelectorAll(".page")
-          .forEach((p) => p.classList.remove("active"));
-        document
-          .querySelectorAll(".nav-btn")
-          .forEach((b) => b.classList.remove("active"));
+        document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+        document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
         document.getElementById(id).classList.add("active");
         if (btn) btn.classList.add("active");
         if (id === "viewPage") loadItems();
@@ -1449,10 +1084,7 @@
       function handleImageSelect(e, previewId) {
         const file = e.target.files[0];
         if (!file) return;
-        if (file.size > 5 * 1024 * 1024) {
-          toast("画像は5MB以内にしてください", "error");
-          return;
-        }
+        if (file.size > 5 * 1024 * 1024) { toast("画像は5MB以内にしてください", "error"); return; }
         if (previewId === "imagePreview") selectedImageFile = file;
         else editImageFile = file;
         const reader = new FileReader();
@@ -1465,14 +1097,9 @@
       }
 
       const uploadArea = document.getElementById("uploadArea");
-      uploadArea.addEventListener("dragover", (e) => {
-        e.preventDefault();
-        uploadArea.classList.add("drag-over");
-      });
-      uploadArea.addEventListener("dragleave", () =>
-        uploadArea.classList.remove("drag-over"),
-      );
-      uploadArea.addEventListener("drop", (e) => {
+      uploadArea.addEventListener("dragover", e => { e.preventDefault(); uploadArea.classList.add("drag-over"); });
+      uploadArea.addEventListener("dragleave", () => uploadArea.classList.remove("drag-over"));
+      uploadArea.addEventListener("drop", e => {
         e.preventDefault();
         uploadArea.classList.remove("drag-over");
         const file = e.dataTransfer.files[0];
@@ -1483,49 +1110,33 @@
       async function uploadImage(file) {
         const ext = file.name.split(".").pop();
         const path = `${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
-        const { error } = await db.storage
-          .from(BUCKET_NAME)
-          .upload(path, file, { upsert: false });
+        const { error } = await db.storage.from(BUCKET_NAME).upload(path, file, { upsert: false });
         if (error) throw error;
         return db.storage.from(BUCKET_NAME).getPublicUrl(path).data.publicUrl;
       }
 
       async function saveItem() {
-        if (!db) {
-          toast("Supabaseが設定されていません", "error");
-          return;
-        }
+        if (!db) { toast("Supabaseが設定されていません", "error"); return; }
         const name = document.getElementById("name").value.trim();
         const category = document.getElementById("category").value;
         const place = document.getElementById("place").value;
-        if (!name || !category || !place) {
-          toast("必須項目を入力してください", "error");
-          return;
-        }
+        if (!name || !category || !place) { toast("必須項目を入力してください", "error"); return; }
         const btn = document.getElementById("submitBtn");
         btn.disabled = true;
         btn.innerHTML = '<span class="spinner"></span> 登録中…';
         try {
           let imageUrl = null;
-          if (selectedImageFile)
-            imageUrl = await uploadImage(selectedImageFile);
-          const { error } = await db.from("items").insert([
-            {
-              name,
-              category,
-              place,
-              qty: parseInt(document.getElementById("qty").value) || 1,
-              supplier:
-                document.getElementById("supplier").value.trim() || null,
-              purchase_date:
-                document.getElementById("purchaseDate").value || null,
-              expiry: document.getElementById("expiry").value || null,
-              warn_days:
-                parseInt(document.getElementById("warnDaysItem").value) || null,
-              memo: document.getElementById("memo").value.trim() || null,
-              image_url: imageUrl,
-            },
-          ]);
+          if (selectedImageFile) imageUrl = await uploadImage(selectedImageFile);
+          const { error } = await db.from("items").insert([{
+            name, category, place,
+            qty: parseInt(document.getElementById("qty").value) || 1,
+            supplier: document.getElementById("supplier").value.trim() || null,
+            purchase_date: document.getElementById("purchaseDate").value || null,
+            expiry: document.getElementById("expiry").value || null,
+            warn_days: parseInt(document.getElementById("warnDaysItem").value) || null,
+            memo: document.getElementById("memo").value.trim() || null,
+            image_url: imageUrl,
+          }]);
           if (error) throw error;
           toast("登録しました！", "success");
           resetRegisterForm();
@@ -1538,20 +1149,12 @@
       }
 
       function resetRegisterForm() {
-        [
-          "name",
-          "supplier",
-          "purchaseDate",
-          "expiry",
-          "memo",
-          "warnDaysItem",
-        ].forEach((id) => (document.getElementById(id).value = ""));
+        ["name","supplier","purchaseDate","expiry","memo","warnDaysItem"].forEach(id => document.getElementById(id).value = "");
         document.getElementById("qty").value = 1;
         document.getElementById("category").value = "";
         document.getElementById("place").value = "";
         const p = document.getElementById("imagePreview");
-        p.style.display = "none";
-        p.src = "";
+        p.style.display = "none"; p.src = "";
         document.getElementById("imgFile").value = "";
         selectedImageFile = null;
       }
@@ -1562,19 +1165,16 @@
           db.from("categories").select("name").order("name"),
           db.from("places").select("name").order("name"),
         ]);
-        ["category", "editCategory"].forEach((id) =>
-          populateSelect(id, cats || []),
-        );
-        ["place", "editPlace"].forEach((id) =>
-          populateSelect(id, places || []),
-        );
+        ["category", "editCategory"].forEach(id => populateSelect(id, cats || []));
+        ["place", "editPlace"].forEach(id => populateSelect(id, places || []));
       }
+
       function populateSelect(id, items) {
         const sel = document.getElementById(id);
         if (!sel) return;
         const cur = sel.value;
         sel.innerHTML = '<option value="">選択してください</option>';
-        items.forEach((i) => sel.appendChild(new Option(i.name, i.name)));
+        items.forEach(i => sel.appendChild(new Option(i.name, i.name)));
         sel.value = cur;
       }
 
@@ -1587,37 +1187,32 @@
         renderTags("categoryTags", cats || [], "category");
         renderTags("placeTags", places || [], "place");
       }
+
       function renderTags(cid, items, type) {
         const el = document.getElementById(cid);
         if (!items.length) {
-          el.innerHTML =
-            '<span style="font-size:13px;color:var(--text2);">まだ登録がありません</span>';
+          el.innerHTML = '<span style="font-size:13px;color:var(--text2);">まだ登録がありません</span>';
           return;
         }
-        el.innerHTML = items
-          .map(
-            (item) =>
-              `<span class="tag">${escapeHtml(item.name)}<button class="del-btn" onclick="deleteListItem('${type}',${item.id},'${escapeHtml(item.name)}')">×</button></span>`,
-          )
-          .join("");
+        // ✏️ 名称変更ボタンを各タグに追加
+        el.innerHTML = items.map(item =>
+          `<span class="tag">
+            ${escapeHtml(item.name)}
+            <button class="rename-btn" title="名称を変更" onclick="openRenameModal('${type}',${item.id},'${escapeHtml(item.name)}')">✏️</button>
+            <button class="del-btn" onclick="deleteListItem('${type}',${item.id},'${escapeHtml(item.name)}')">×</button>
+          </span>`
+        ).join("");
       }
+
       async function addListItem(type) {
         if (!db) return;
         const inputId = type === "category" ? "categoryInput" : "placeInput";
         const table = type === "category" ? "categories" : "places";
         const value = document.getElementById(inputId).value.trim();
-        if (!value) {
-          toast("名前を入力してください", "error");
-          return;
-        }
+        if (!value) { toast("名前を入力してください", "error"); return; }
         const { error } = await db.from(table).insert([{ name: value }]);
         if (error) {
-          toast(
-            error.message.includes("unique")
-              ? "既に存在しています"
-              : "エラー: " + error.message,
-            "error",
-          );
+          toast(error.message.includes("unique") ? "既に存在しています" : "エラー: " + error.message, "error");
           return;
         }
         document.getElementById(inputId).value = "";
@@ -1625,56 +1220,111 @@
         renderListPage();
         loadSelectLists();
       }
+
       async function deleteListItem(type, id, name) {
         if (!confirm(`「${name}」を削除しますか？`)) return;
         const table = type === "category" ? "categories" : "places";
         const { error } = await db.from(table).delete().eq("id", id);
-        if (error) {
-          toast("削除エラー: " + error.message, "error");
-          return;
-        }
+        if (error) { toast("削除エラー: " + error.message, "error"); return; }
         toast("削除しました", "success");
         renderListPage();
         loadSelectLists();
       }
 
+      // ★ 名称変更モーダルを開く
+      function openRenameModal(type, id, currentName) {
+        document.getElementById("renameId").value = id;
+        document.getElementById("renameType").value = type;
+        document.getElementById("renameOldName").value = currentName;
+        document.getElementById("renameNewName").value = currentName;
+        const typeLabel = type === "category" ? "カテゴリー" : "保管場所";
+        document.getElementById("renameModalTitle").textContent = `✏️ ${typeLabel}の名称を変更`;
+        document.getElementById("renameNote").textContent =
+          `「${currentName}」の名称を変更します。この${typeLabel}が設定されているすべての品目も自動的に更新されます。`;
+        document.getElementById("renameModal").classList.add("open");
+        setTimeout(() => {
+          const inp = document.getElementById("renameNewName");
+          inp.focus();
+          inp.select();
+        }, 100);
+      }
+
+      // ★ 名称変更を保存（DBテーブル + itemsテーブルの該当フィールドも一括更新）
+      async function saveRename() {
+        const id = parseInt(document.getElementById("renameId").value);
+        const type = document.getElementById("renameType").value;
+        const oldName = document.getElementById("renameOldName").value;
+        const newName = document.getElementById("renameNewName").value.trim();
+
+        if (!newName) { toast("新しい名称を入力してください", "error"); return; }
+        if (newName === oldName) { closeModal("renameModal"); return; }
+
+        const table = type === "category" ? "categories" : "places";
+        const itemField = type === "category" ? "category" : "place";
+
+        const btn = document.getElementById("renameSaveBtn");
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner"></span> 変更中…';
+
+        try {
+          // 1. マスターテーブルの名称を更新
+          const { error: masterErr } = await db.from(table).update({ name: newName }).eq("id", id);
+          if (masterErr) {
+            if (masterErr.message.includes("unique")) throw new Error("その名称は既に存在しています");
+            throw masterErr;
+          }
+
+          // 2. itemsテーブルの該当フィールドを一括更新（旧名称 → 新名称）
+          const { error: itemsErr } = await db.from("items").update({ [itemField]: newName }).eq(itemField, oldName);
+          if (itemsErr) throw itemsErr;
+
+          toast(`「${oldName}」→「${newName}」に変更しました ✅`, "success", 4000);
+          closeModal("renameModal");
+          renderListPage();
+          loadSelectLists();
+          // 一覧ページのデータも更新
+          if (allItems.length) loadItems();
+        } catch (e) {
+          toast("エラー: " + e.message, "error");
+        } finally {
+          btn.disabled = false;
+          btn.innerHTML = "💾 変更する";
+        }
+      }
+
+      // Enterキーで名称変更を確定
+      document.addEventListener("DOMContentLoaded", () => {
+        document.getElementById("renameNewName").addEventListener("keydown", e => {
+          if (e.key === "Enter") { e.preventDefault(); saveRename(); }
+        });
+      });
+
       async function loadItems() {
         if (!db) return;
         const tbody = document.getElementById("itemsBody");
         const cardList = document.getElementById("cardList");
-        tbody.innerHTML =
-          '<tr><td colspan="10" class="empty"><span class="spinner-dark"></span> 読み込み中…</td></tr>';
-        cardList.innerHTML =
-          '<div class="empty"><span class="spinner-dark"></span> 読み込み中…</div>';
-        const { data, error } = await db
-          .from("items")
-          .select("*")
-          .order("created_at", { ascending: false });
+        tbody.innerHTML = '<tr><td colspan="10" class="empty"><span class="spinner-dark"></span> 読み込み中…</td></tr>';
+        cardList.innerHTML = '<div class="empty"><span class="spinner-dark"></span> 読み込み中…</div>';
+        const { data, error } = await db.from("items").select("*").order("created_at", { ascending: false });
         if (error) {
           tbody.innerHTML = `<tr><td colspan="10" class="empty" style="color:var(--red)">読み込み失敗: ${error.message}</td></tr>`;
           return;
         }
         allItems = data || [];
-        const active = allItems.filter((i) => i.status !== "deleted");
-        const cats = [
-          ...new Set(active.map((i) => i.category).filter(Boolean)),
-        ].sort();
-        const plcs = [
-          ...new Set(active.map((i) => i.place).filter(Boolean)),
-        ].sort();
-        const fc = document.getElementById("filterCat"),
-          fp = document.getElementById("filterPlace");
+        const active = allItems.filter(i => i.status !== "deleted");
+        const cats = [...new Set(active.map(i => i.category).filter(Boolean))].sort();
+        const plcs = [...new Set(active.map(i => i.place).filter(Boolean))].sort();
+        const fc = document.getElementById("filterCat"), fp = document.getElementById("filterPlace");
         fc.innerHTML = '<option value="">すべて</option>';
-        cats.forEach((c) => fc.appendChild(new Option(c, c)));
+        cats.forEach(c => fc.appendChild(new Option(c, c)));
         fp.innerHTML = '<option value="">すべて</option>';
-        plcs.forEach((p) => fp.appendChild(new Option(p, p)));
+        plcs.forEach(p => fp.appendChild(new Option(p, p)));
         updateStats(allItems);
         filterItems();
       }
 
       function getWarnDate(item, today) {
-        const days =
-          item.warn_days && item.warn_days > 0 ? item.warn_days : WARN_DAYS;
+        const days = item.warn_days && item.warn_days > 0 ? item.warn_days : WARN_DAYS;
         const d = new Date(today);
         d.setDate(d.getDate() + days);
         return d;
@@ -1683,16 +1333,10 @@
       function updateStats(items) {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
-        let expired = 0,
-          soon = 0,
-          totalQty = 0,
-          consumed = 0;
-        items.forEach((item) => {
+        let expired = 0, soon = 0, totalQty = 0, consumed = 0;
+        items.forEach(item => {
           if (item.status === "deleted") return;
-          if (item.status === "consumed") {
-            consumed++;
-            return;
-          }
+          if (item.status === "consumed") { consumed++; return; }
           totalQty += item.qty || 0;
           if (item.expiry) {
             const exp = new Date(item.expiry);
@@ -1701,9 +1345,7 @@
             else if (exp <= dWarn) soon++;
           }
         });
-        const ac = items.filter(
-          (i) => i.status !== "deleted" && i.status !== "consumed",
-        ).length;
+        const ac = items.filter(i => i.status !== "deleted" && i.status !== "consumed").length;
         document.getElementById("statTotal").textContent = ac;
         document.getElementById("statExpired").textContent = expired;
         document.getElementById("statSoon").textContent = soon;
@@ -1714,7 +1356,7 @@
 
       function setStatFilter(type) {
         activeStatFilter = type;
-        ["All", "Expired", "Soon", "Qty", "Consumed"].forEach((t) => {
+        ["All","Expired","Soon","Qty","Consumed"].forEach(t => {
           const c = document.getElementById("statCard" + t);
           if (c) c.classList.remove("active-filter");
         });
@@ -1728,14 +1370,12 @@
           tagEl.style.display = "none";
           document.getElementById("showConsumed").checked = false;
         } else {
-          const capitalize = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+          const capitalize = s => s.charAt(0).toUpperCase() + s.slice(1);
           const card = document.getElementById("statCard" + capitalize(type));
           if (card) card.classList.add("active-filter");
-          document.getElementById("filterTagLabel").textContent =
-            labels[type] || "";
+          document.getElementById("filterTagLabel").textContent = labels[type] || "";
           tagEl.style.display = "block";
-          if (type === "consumed")
-            document.getElementById("showConsumed").checked = true;
+          if (type === "consumed") document.getElementById("showConsumed").checked = true;
         }
         filterItems();
       }
@@ -1748,7 +1388,7 @@
         const today = new Date();
         today.setHours(0, 0, 0, 0);
 
-        let filtered = allItems.filter((item) => {
+        let filtered = allItems.filter(item => {
           if (item.status === "deleted") return false;
           if (activeStatFilter === "expired") {
             if (item.status === "consumed") return false;
@@ -1764,29 +1404,16 @@
           } else {
             if (item.status === "consumed" && !showConsumed) return false;
           }
-          const matchKw =
-            !kw ||
-            [
-              item.name,
-              item.memo,
-              item.supplier,
-              item.category,
-              item.place,
-            ].some((v) => v?.toLowerCase().includes(kw));
-          return (
-            matchKw &&
-            (!cat || item.category === cat) &&
-            (!plc || item.place === plc)
-          );
+          const matchKw = !kw || [item.name, item.memo, item.supplier, item.category, item.place]
+            .some(v => v?.toLowerCase().includes(kw));
+          return matchKw && (!cat || item.category === cat) && (!plc || item.place === plc);
         });
 
         filtered.sort((a, b) => {
           if (a.status === "consumed" && b.status !== "consumed") return 1;
           if (a.status !== "consumed" && b.status === "consumed") return -1;
-          const ea = a.expiry ? new Date(a.expiry) : null,
-            eb = b.expiry ? new Date(b.expiry) : null;
-          const expA = ea && ea < today,
-            expB = eb && eb < today;
+          const ea = a.expiry ? new Date(a.expiry) : null, eb = b.expiry ? new Date(b.expiry) : null;
+          const expA = ea && ea < today, expB = eb && eb < today;
           if (expA && !expB) return -1;
           if (!expA && expB) return 1;
           if (ea && eb) return ea - eb;
@@ -1799,18 +1426,12 @@
       }
 
       function buildExpiry(item, today, isConsumed) {
-        let expClass = "",
-          expText = escapeHtml(item.expiry || "");
+        let expClass = "", expText = escapeHtml(item.expiry || "");
         if (!isConsumed && item.expiry) {
           const exp = new Date(item.expiry);
           const dWarn = getWarnDate(item, today);
-          if (exp < today) {
-            expClass = "expiry-warn";
-            expText += " ⚠️";
-          } else if (exp <= dWarn) {
-            expClass = "expiry-soon";
-            expText += " ⚠️";
-          }
+          if (exp < today) { expClass = "expiry-warn"; expText += " ⚠️"; }
+          else if (exp <= dWarn) { expClass = "expiry-soon"; expText += " ⚠️"; }
         }
         return { expClass, expText };
       }
@@ -1818,97 +1439,86 @@
       function displayItems(items, today) {
         const tbody = document.getElementById("itemsBody");
         if (!items.length) {
-          tbody.innerHTML =
-            '<tr><td colspan="10" class="empty"><div class="empty-icon">📦</div>一致する品目がありません</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="10" class="empty"><div class="empty-icon">📦</div>一致する品目がありません</td></tr>';
           return;
         }
-        tbody.innerHTML = items
-          .map((item) => {
-            const isConsumed = item.status === "consumed";
-            const { expClass, expText } = buildExpiry(item, today, isConsumed);
-            const imgCell = item.image_url
-              ? `<img class="thumb" src="${escapeHtml(item.image_url)}" onclick="openImgModal('${escapeHtml(item.image_url)}')" loading="lazy">`
-              : `<div class="thumb-ph">📦</div>`;
-            const consumedBadge = isConsumed
-              ? '<span class="badge-consumed">消費済み</span> '
-              : "";
-            const actionBtns = isConsumed
-              ? `<div class="action-btns"><button class="btn btn-sm btn-restore" onclick="updateStatus(${item.id},'active')">↩ 戻す</button><button class="btn btn-sm btn-delete" onclick="deleteItem(${item.id},'${escapeHtml(item.name)}')">🗑</button></div>`
-              : `<div class="action-btns"><button class="btn btn-sm btn-edit" onclick="openEditModal(${item.id})">✏️ 編集</button><button class="btn btn-sm btn-consumed" onclick="updateStatus(${item.id},'consumed')">✅</button><button class="btn btn-sm btn-delete" onclick="deleteItem(${item.id},'${escapeHtml(item.name)}')">🗑</button></div>`;
-            return `<tr class="${isConsumed ? "consumed-row" : ""}">
-      <td>${imgCell}</td>
-      <td><strong>${consumedBadge}${escapeHtml(item.name)}</strong></td>
-      <td><span class="badge badge-cat">${escapeHtml(item.category)}</span></td>
-      <td style="text-align:center;font-weight:600;color:var(--red)">${item.qty || 0}</td>
-      <td><span class="badge badge-place">${escapeHtml(item.place)}</span></td>
-      <td>${escapeHtml(item.supplier || "")}</td>
-      <td>${escapeHtml(item.purchase_date || "")}</td>
-      <td class="${expClass}">${expText}</td>
-      <td style="color:var(--text2);font-size:12px;">${escapeHtml(item.memo || "")}</td>
-      <td>${actionBtns}</td></tr>`;
-          })
-          .join("");
+        tbody.innerHTML = items.map(item => {
+          const isConsumed = item.status === "consumed";
+          const { expClass, expText } = buildExpiry(item, today, isConsumed);
+          const imgCell = item.image_url
+            ? `<img class="thumb" src="${escapeHtml(item.image_url)}" onclick="openImgModal('${escapeHtml(item.image_url)}')" loading="lazy">`
+            : `<div class="thumb-ph">📦</div>`;
+          const consumedBadge = isConsumed ? '<span class="badge-consumed">消費済み</span> ' : "";
+          const actionBtns = isConsumed
+            ? `<div class="action-btns"><button class="btn btn-sm btn-restore" onclick="updateStatus(${item.id},'active')">↩ 戻す</button><button class="btn btn-sm btn-delete" onclick="deleteItem(${item.id},'${escapeHtml(item.name)}')">🗑</button></div>`
+            : `<div class="action-btns"><button class="btn btn-sm btn-edit" onclick="openEditModal(${item.id})">✏️ 編集</button><button class="btn btn-sm btn-consumed" onclick="updateStatus(${item.id},'consumed')">✅</button><button class="btn btn-sm btn-delete" onclick="deleteItem(${item.id},'${escapeHtml(item.name)}')">🗑</button></div>`;
+          return `<tr class="${isConsumed ? "consumed-row" : ""}">
+            <td>${imgCell}</td>
+            <td><strong>${consumedBadge}${escapeHtml(item.name)}</strong></td>
+            <td><span class="badge badge-cat">${escapeHtml(item.category)}</span></td>
+            <td style="text-align:center;font-weight:600;color:var(--red)">${item.qty || 0}</td>
+            <td><span class="badge badge-place">${escapeHtml(item.place)}</span></td>
+            <td>${escapeHtml(item.supplier || "")}</td>
+            <td>${escapeHtml(item.purchase_date || "")}</td>
+            <td class="${expClass}">${expText}</td>
+            <td style="color:var(--text2);font-size:12px;">${escapeHtml(item.memo || "")}</td>
+            <td>${actionBtns}</td>
+          </tr>`;
+        }).join("");
       }
 
       function displayCards(items, today) {
         const cl = document.getElementById("cardList");
         if (!items.length) {
-          cl.innerHTML =
-            '<div class="empty"><div class="empty-icon">📦</div>一致する品目がありません</div>';
+          cl.innerHTML = '<div class="empty"><div class="empty-icon">📦</div>一致する品目がありません</div>';
           return;
         }
-        cl.innerHTML = items
-          .map((item) => {
-            const isConsumed = item.status === "consumed";
-            const { expClass, expText } = buildExpiry(item, today, isConsumed);
-            const imgHtml = item.image_url
-              ? `<img class="card-thumb" src="${escapeHtml(item.image_url)}" onclick="openImgModal('${escapeHtml(item.image_url)}')" loading="lazy">`
-              : `<div class="card-thumb-ph">📦</div>`;
-            const consumedBadge = isConsumed
-              ? '<span class="badge-consumed">消費済み</span>'
-              : "";
-            const actionBtns = isConsumed
-              ? `<button class="btn btn-sm btn-restore" onclick="updateStatus(${item.id},'active')">↩ 戻す</button><button class="btn btn-sm btn-delete" onclick="deleteItem(${item.id},'${escapeHtml(item.name)}')">🗑 削除</button>`
-              : `<button class="btn btn-sm btn-edit" onclick="openEditModal(${item.id})">✏️ 編集</button><button class="btn btn-sm btn-consumed" onclick="updateStatus(${item.id},'consumed')">✅ 消費済み</button><button class="btn btn-sm btn-delete" onclick="deleteItem(${item.id},'${escapeHtml(item.name)}')">🗑 削除</button>`;
-            return `<div class="item-card ${isConsumed ? "consumed-card" : ""}">
-      <div class="item-card-head">
-        ${imgHtml}
-        <div class="card-title-wrap">
-          <h3>${escapeHtml(item.name)}</h3>
-          <div class="card-badges">${consumedBadge}<span class="badge badge-cat">${escapeHtml(item.category)}</span><span class="badge badge-place">${escapeHtml(item.place)}</span></div>
-        </div>
-      </div>
-      <div class="item-card-body">
-        <div class="card-field"><label>数量</label><span style="color:var(--red);font-weight:700;">${item.qty || 0}</span></div>
-        <div class="card-field"><label>購入先</label><span>${escapeHtml(item.supplier || "—")}</span></div>
-        <div class="card-field"><label>購入日</label><span>${escapeHtml(item.purchase_date || "—")}</span></div>
-        <div class="card-field"><label>使用期限</label><span class="${expClass}">${expText || "—"}</span></div>
-        ${item.memo ? `<div class="card-field" style="grid-column:1/-1"><label>メモ</label><span>${escapeHtml(item.memo)}</span></div>` : ""}
-      </div>
-      <div class="item-card-foot">${actionBtns}</div>
-    </div>`;
-          })
-          .join("");
+        cl.innerHTML = items.map(item => {
+          const isConsumed = item.status === "consumed";
+          const { expClass, expText } = buildExpiry(item, today, isConsumed);
+          const imgHtml = item.image_url
+            ? `<img class="card-thumb" src="${escapeHtml(item.image_url)}" onclick="openImgModal('${escapeHtml(item.image_url)}')" loading="lazy">`
+            : `<div class="card-thumb-ph">📦</div>`;
+          const consumedBadge = isConsumed ? '<span class="badge-consumed">消費済み</span>' : "";
+          const actionBtns = isConsumed
+            ? `<button class="btn btn-sm btn-restore" onclick="updateStatus(${item.id},'active')">↩ 戻す</button><button class="btn btn-sm btn-delete" onclick="deleteItem(${item.id},'${escapeHtml(item.name)}')">🗑 削除</button>`
+            : `<button class="btn btn-sm btn-edit" onclick="openEditModal(${item.id})">✏️ 編集</button><button class="btn btn-sm btn-consumed" onclick="updateStatus(${item.id},'consumed')">✅ 消費済み</button><button class="btn btn-sm btn-delete" onclick="deleteItem(${item.id},'${escapeHtml(item.name)}')">🗑 削除</button>`;
+          return `<div class="item-card ${isConsumed ? "consumed-card" : ""}">
+            <div class="item-card-head">
+              ${imgHtml}
+              <div class="card-title-wrap">
+                <h3>${escapeHtml(item.name)}</h3>
+                <div class="card-badges">${consumedBadge}<span class="badge badge-cat">${escapeHtml(item.category)}</span><span class="badge badge-place">${escapeHtml(item.place)}</span></div>
+              </div>
+            </div>
+            <div class="item-card-body">
+              <div class="card-field"><label>数量</label><span style="color:var(--red);font-weight:700;">${item.qty || 0}</span></div>
+              <div class="card-field"><label>購入先</label><span>${escapeHtml(item.supplier || "—")}</span></div>
+              <div class="card-field"><label>購入日</label><span>${escapeHtml(item.purchase_date || "—")}</span></div>
+              <div class="card-field"><label>使用期限</label><span class="${expClass}">${expText || "—"}</span></div>
+              ${item.memo ? `<div class="card-field" style="grid-column:1/-1"><label>メモ</label><span>${escapeHtml(item.memo)}</span></div>` : ""}
+            </div>
+            <div class="item-card-foot">${actionBtns}</div>
+          </div>`;
+        }).join("");
       }
 
       async function openEditModal(id) {
-        const item = allItems.find((i) => i.id === id);
+        const item = allItems.find(i => i.id === id);
         if (!item) return;
         await loadSelectLists();
         document.getElementById("editId").value = item.id;
         document.getElementById("editName").value = item.name || "";
         document.getElementById("editQty").value = item.qty || 1;
         document.getElementById("editSupplier").value = item.supplier || "";
-        document.getElementById("editPurchaseDate").value =
-          item.purchase_date || "";
+        document.getElementById("editPurchaseDate").value = item.purchase_date || "";
         document.getElementById("editExpiry").value = item.expiry || "";
         document.getElementById("editWarnDays").value = item.warn_days || "";
         document.getElementById("editMemo").value = item.memo || "";
         document.getElementById("editCategory").value = item.category || "";
         document.getElementById("editPlace").value = item.place || "";
         const editPrev = document.getElementById("editImagePreview");
-        editPrev.style.display = "none";
-        editPrev.src = "";
+        editPrev.style.display = "none"; editPrev.src = "";
         document.getElementById("editImgFile").value = "";
         editImageFile = null;
         document.getElementById("editCurrentImg").innerHTML = item.image_url
@@ -1922,35 +1532,23 @@
         const name = document.getElementById("editName").value.trim();
         const category = document.getElementById("editCategory").value;
         const place = document.getElementById("editPlace").value;
-        if (!name || !category || !place) {
-          toast("必須項目を入力してください", "error");
-          return;
-        }
+        if (!name || !category || !place) { toast("必須項目を入力してください", "error"); return; }
         const btn = document.getElementById("editSaveBtn");
         btn.disabled = true;
         btn.innerHTML = '<span class="spinner"></span> 保存中…';
         try {
-          const current = allItems.find((i) => i.id === id);
+          const current = allItems.find(i => i.id === id);
           let imageUrl = current?.image_url || null;
           if (editImageFile) imageUrl = await uploadImage(editImageFile);
-          const { error } = await db
-            .from("items")
-            .update({
-              name,
-              category,
-              place,
-              image_url: imageUrl,
-              qty: parseInt(document.getElementById("editQty").value) || 1,
-              supplier:
-                document.getElementById("editSupplier").value.trim() || null,
-              purchase_date:
-                document.getElementById("editPurchaseDate").value || null,
-              expiry: document.getElementById("editExpiry").value || null,
-              warn_days:
-                parseInt(document.getElementById("editWarnDays").value) || null,
-              memo: document.getElementById("editMemo").value.trim() || null,
-            })
-            .eq("id", id);
+          const { error } = await db.from("items").update({
+            name, category, place, image_url: imageUrl,
+            qty: parseInt(document.getElementById("editQty").value) || 1,
+            supplier: document.getElementById("editSupplier").value.trim() || null,
+            purchase_date: document.getElementById("editPurchaseDate").value || null,
+            expiry: document.getElementById("editExpiry").value || null,
+            warn_days: parseInt(document.getElementById("editWarnDays").value) || null,
+            memo: document.getElementById("editMemo").value.trim() || null,
+          }).eq("id", id);
           if (error) throw error;
           toast("更新しました！", "success");
           closeModal("editModal");
@@ -1965,33 +1563,16 @@
 
       async function updateStatus(id, status) {
         if (!db) return;
-        const { error } = await db
-          .from("items")
-          .update({ status })
-          .eq("id", id);
-        if (error) {
-          toast("更新エラー: " + error.message, "error");
-          return;
-        }
-        toast(
-          status === "consumed" ? "消費済みにしました ✅" : "元に戻しました",
-          "success",
-        );
+        const { error } = await db.from("items").update({ status }).eq("id", id);
+        if (error) { toast("更新エラー: " + error.message, "error"); return; }
+        toast(status === "consumed" ? "消費済みにしました ✅" : "元に戻しました", "success");
         loadItems();
       }
 
       async function deleteItem(id, name) {
-        if (
-          !confirm(
-            `「${name}」を完全に削除しますか？\nこの操作は元に戻せません。`,
-          )
-        )
-          return;
+        if (!confirm(`「${name}」を完全に削除しますか？\nこの操作は元に戻せません。`)) return;
         const { error } = await db.from("items").delete().eq("id", id);
-        if (error) {
-          toast("削除エラー: " + error.message, "error");
-          return;
-        }
+        if (error) { toast("削除エラー: " + error.message, "error"); return; }
         toast("削除しました", "success");
         loadItems();
       }
@@ -2005,39 +1586,24 @@
           .replace(/"/g, "&quot;");
       }
 
-      // ── 注意日数 設定 ────────────────────────────
       function setWarnDays(days) {
         WARN_DAYS = days;
         localStorage.setItem("warnDays", days);
         applyWarnDaysUI();
-        if (allItems.length) {
-          updateStats(allItems);
-          filterItems();
-        }
+        if (allItems.length) { updateStats(allItems); filterItems(); }
       }
       function setWarnDaysCustom() {
         const v = parseInt(document.getElementById("warnDaysInput").value, 10);
-        if (!v || v < 1) {
-          toast("1以上の日数を入力してください", "error");
-          return;
-        }
+        if (!v || v < 1) { toast("1以上の日数を入力してください", "error"); return; }
         setWarnDays(v);
         document.getElementById("warnDaysInput").value = "";
       }
       function applyWarnDaysUI() {
-        document.querySelectorAll(".warn-days-btn").forEach((btn) => {
-          btn.classList.toggle(
-            "btn-primary",
-            parseInt(btn.dataset.days) === WARN_DAYS,
-          );
-          btn.classList.toggle(
-            "btn-ghost",
-            parseInt(btn.dataset.days) !== WARN_DAYS,
-          );
+        document.querySelectorAll(".warn-days-btn").forEach(btn => {
+          btn.classList.toggle("btn-primary", parseInt(btn.dataset.days) === WARN_DAYS);
+          btn.classList.toggle("btn-ghost", parseInt(btn.dataset.days) !== WARN_DAYS);
         });
-        document.getElementById("warnDaysStatus").textContent =
-          `現在: ${WARN_DAYS}日前`;
-        // 統計ラベルも更新
+        document.getElementById("warnDaysStatus").textContent = `現在: ${WARN_DAYS}日前`;
         const lbl = document.getElementById("statSoonLbl");
         if (lbl) lbl.textContent = `⚠️ 注意（${WARN_DAYS}日以内）`;
       }
@@ -2045,13 +1611,9 @@
       document.addEventListener("DOMContentLoaded", () => {
         if (db) loadSelectLists();
         applyWarnDaysUI();
-        document
-          .querySelectorAll('input[type="text"],input[type="number"]')
-          .forEach((el) => {
-            el.addEventListener("keydown", (e) => {
-              if (e.key === "Enter") e.preventDefault();
-            });
-          });
+        document.querySelectorAll('input[type="text"],input[type="number"]').forEach(el => {
+          el.addEventListener("keydown", e => { if (e.key === "Enter") e.preventDefault(); });
+        });
       });
     </script>
   </body>
