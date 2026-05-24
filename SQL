@@ -1,0 +1,51 @@
+-- テーブル作成
+create table categories (
+  id         bigserial primary key,
+  name       text not null unique,
+  created_at timestamptz default now()
+);
+
+create table places (
+  id         bigserial primary key,
+  name       text not null unique,
+  created_at timestamptz default now()
+);
+
+create table items (
+  id            bigserial primary key,
+  name          text not null,
+  category      text,
+  qty           integer default 1,
+  place         text,
+  supplier      text,
+  purchase_date date,
+  expiry        date,
+  memo          text,
+  image_url     text,
+  status        text default 'active',
+  warn_days     integer,
+  created_at    timestamptz default now()
+);
+
+-- 初期データ
+insert into categories (name) values
+  ('食料・飲料'), ('衛生用品'), ('ライト用品'), ('防寒用品'), ('その他');
+
+insert into places (name) values
+  ('Aリュック'), ('Bリュック'), ('Cカート'), ('倉庫');
+
+-- RLS 有効化
+alter table categories enable row level security;
+alter table places     enable row level security;
+alter table items      enable row level security;
+
+-- ポリシー作成
+create policy "allow_all" on categories for all using (true) with check (true);
+create policy "allow_all" on places     for all using (true) with check (true);
+create policy "allow_all" on items      for all using (true) with check (true);
+
+-- Storage ポリシー
+create policy "allow_all_storage"
+  on storage.objects for all
+  using (bucket_id = 'item-images')
+  with check (bucket_id = 'item-images');
